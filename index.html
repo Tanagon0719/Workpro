@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Work Pro Israel</title>
+    <style>
+        :root { --primary: #4a90e2; --secondary: #f39c12; --danger: #e74c3c; --success: #2ecc71; --dark: #2c3e50; --light: #f8f9fa; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #eef2f7; margin: 0; padding: 15px; }
+        .container { width: 100%; max-width: 500px; margin: 0 auto; }
+        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 15px; }
+        h1, h3 { color: var(--dark); text-align: center; margin: 0 0 15px 0; }
+        .timer-display { font-size: 3rem; font-weight: bold; color: var(--primary); text-align: center; margin: 10px 0; font-family: monospace; }
+        .status-badge { display: block; text-align: center; padding: 8px; border-radius: 20px; background: #eee; font-size: 0.9rem; margin-bottom: 15px; font-weight: bold; }
+        input { padding: 12px; border: 1px solid #ddd; border-radius: 8px; width: 100%; box-sizing: border-box; font-size: 1rem; margin-top: 5px; }
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        button { padding: 15px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 1rem; color: white; transition: 0.2s; }
+        button:active { opacity: 0.7; transform: scale(0.98); }
+        .btn-start { background: var(--success); grid-column: span 2; }
+        .btn-save { background: var(--primary); width: 100%; margin-top: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { background: var(--light); padding: 10px; text-align: left; font-size: 0.8rem; color: #666; }
+        td { padding: 12px 10px; border-bottom: 1px solid #eee; font-size: 0.9rem; }
+        .summary { background: var(--dark); color: white; padding: 20px; border-radius: 15px; display: flex; justify-content: space-between; margin-top: 10px; }
+        .del-btn { color: var(--danger); background: none; font-size: 1.2rem; border: none; padding: 5px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <h1>Work Pro ₪</h1>
+        <label style="font-size: 0.8rem;">ค่าแรง/ชม:</label>
+        <input type="number" id="rate" value="38" oninput="renderData()">
+    </div>
+
+    <div class="card">
+        <input type="date" id="currentDate">
+        <div class="timer-display" id="timerDisplay">00:00:00</div>
+        <div id="statusLabel" class="status-badge">สถานะ: พร้อมเริ่มงาน</div>
+        <div class="btn-grid">
+            <button id="startBtn" class="btn-start" onclick="startWork()">เริ่มทำงาน</button>
+            <button id="breakBtn" style="display:none; background:var(--secondary);" onclick="toggleBreak()">พักเบรก</button>
+            <button id="endBtn" style="display:none; background:var(--danger);" onclick="endWork()">เลิกงาน</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>เพิ่มย้อนหลัง</h3>
+        <label style="font-size: 0.8rem;">วันที่:</label>
+        <input type="date" id="manualDate">
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+            <div style="flex:1;"><label style="font-size: 0.7rem;">เริ่ม:</label><input type="time" id="timeIn" value="06:00"></div>
+            <div style="flex:1;"><label style="font-size: 0.7rem;">เลิก:</label><input type="time" id="timeOut" value="17:00"></div>
+            <div style="flex:1;"><label style="font-size: 0.7rem;">พัก(ชม):</label><input type="number" id="manualBreak" value="0.5" step="0.1"></div>
+        </div>
+        <button class="btn-save" onclick="saveManual()">บันทึกย้อนหลัง</button>
+    </div>
+
+    <div class="card" style="padding: 10px; overflow-x: auto;">
+        <h3>ประวัติ</h3>
+        <table>
+            <thead><tr><th>วันที่</th><th>ชม.</th><th>เงิน</th><th></th></tr></thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
+
+    <div class="summary">
+        <div><small>ชม.รวม</small><br><span id="totalH" style="font-size: 1.4rem;">0.00</span></div>
+        <div style="text-align: right;"><small>เงินรวม</small><br><span style="font-size: 1.4rem; color: var(--success);">₪ <span id="totalP">0</span></span></div>
+    </div>
+
+    <button onclick="clearSystem()" style="width:100%; background:none; color:#aaa; margin-top: 30px; font-size: 0.8rem; border: 1px solid #ddd;">รีเซ็ตระบบ</button>
+</div>
+
+<script>
+    // ตั้งค่าเริ่มต้น
+    const getToday = () => new Date().toISOString().split('T')[0];
+    document.getElementById('currentDate').value = getToday();
+    document.getElementById('manualDate').value = getToday();
+
+    let workData = JSON.parse(localStorage.getItem('work_data_v2') || "{}");
+    let timerInterval;
+    let startTime = null;
+
+    function renderData() {
+        const tbody = document.getElementById('tableBody');
+        const rate = parseFloat(document.getElementById('rate').value) || 0;
+        let sumH = 0, sumP = 0;
+        tbody.innerHTML = "";
+
+        const sortedDates = Object.keys(workData).sort().reverse();
+        sortedDates.forEach(date => {
+            const h = parseFloat(workData[date]);
+            const p = calculateIsraelPay(h, rate);
+            sumH += h; sumP += p;
+            tbody.innerHTML += `<tr>
+                <td>${date}</td>
+                <td>${h.toFixed(2)}</td>
+                <td>₪${Math.round(p)}</td>
+                <td><button class="del-btn" onclick="deleteItem('${date}')">✕</button></td>
+            </tr>`;
+        });
+
+        document.getElementById('totalH').innerText = sumH.toFixed(2);
+        document.getElementById('totalP').innerText = Math.round(sumP).toLocaleString();
+        localStorage.setItem('work_data_v2', JSON.stringify(workData));
+    }
+
+    function calculateIsraelPay(h, r) {
+        let normal = Math.min(8, h);
+        let ot125 = Math.max(0, Math.min(2, h - 8));
+        let ot150 = Math.max(0, h - 10);
+        return (normal * r) + (ot125 * r * 1.25) + (ot150 * r * 1.5);
+    }
+
+    function saveManual() {
+        const d = document.getElementById('manualDate').value;
+        const tIn = document.getElementById('timeIn').value;
+        const tOut = document.getElementById('timeOut').value;
+        const b = parseFloat(document.getElementById('manualBreak').value) || 0;
+
+        if(!d || !tIn || !tOut) return alert("กรุณากรอกข้อมูลให้ครบ");
+
+        // คำนวณเวลาแบบรองรับ iOS
+        const s = new Date(d.replace(/-/g, '/') + ' ' + tIn);
+        let e = new Date(d.replace(/-/g, '/') + ' ' + tOut);
+        if (e <= s) e.setDate(e.getDate() + 1);
+
+        const diff = (e - s) / 3600000 - b;
+        if(diff <= 0) return alert("ตรวจสอบเวลาอีกครั้ง");
+
+        workData[d] = (parseFloat(workData[d] || 0) + diff).toFixed(2);
+        renderData();
+        alert("บันทึกสำเร็จ!");
+    }
+
+    function deleteItem(d) {
+        if(confirm('ลบรายการ?')) {
+            delete workData[d];
+            renderData();
+        }
+    }
+
+    function startWork() {
+        startTime = new Date();
+        document.getElementById('startBtn').style.display = 'none';
+        document.getElementById('breakBtn').style.display = 'block';
+        document.getElementById('endBtn').style.display = 'block';
+        document.getElementById('statusLabel').innerText = "กำลังทำงาน...";
+        timerInterval = setInterval(updateTimer, 1000);
+    }
+
+    function updateTimer() {
+        const now = new Date();
+        const diff = now - startTime;
+        const h = Math.floor(diff / 3600000);
+        const m = Math.floor((diff % 3600000) / 60000);
+        const s = Math.floor((diff % 60000) / 1000);
+        document.getElementById('timerDisplay').innerText = 
+            `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+    }
+
+    function endWork() {
+        if(!confirm("ต้องการบันทึกเวลาเลิกงาน?")) return;
+        const diff = (new Date() - startTime) / 3600000;
+        const d = document.getElementById('currentDate').value;
+        workData[d] = (parseFloat(workData[d] || 0) + diff).toFixed(2);
+        clearInterval(timerInterval);
+        location.reload();
+    }
+
+    function clearSystem() {
+        if(confirm("ล้างข้อมูลทั้งหมด?")) {
+            localStorage.clear();
+            location.reload();
+        }
+    }
+
+    renderData();
+</script>
+</body>
+</html>
+
