@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Work Pro Israel</title>
+    <title>Work Pro Israel V2</title>
     <style>
-        :root { --primary: #4a90e2; --secondary: #f39c12; --danger: #e74c3c; --success: #2ecc71; --dark: #2c3e50; --light: #f8f9fa; }
+        :root { --primary: #4a90e2; --secondary: #f39c12; --danger: #e74c3c; --success: #2ecc71; --dark: #2c3e50; --light: #f8f9fa; --ot-color: #9b59b6; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #eef2f7; margin: 0; padding: 15px; }
-        .container { width: 100%; max-width: 500px; margin: 0 auto; }
+        .container { width: 100%; max-width: 600px; margin: 0 auto; }
         .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 15px; }
         h1, h3 { color: var(--dark); text-align: center; margin: 0 0 15px 0; }
         .timer-display { font-size: 3rem; font-weight: bold; color: var(--primary); text-align: center; margin: 10px 0; font-family: monospace; }
@@ -18,11 +18,14 @@
         button:active { opacity: 0.7; transform: scale(0.98); }
         .btn-start { background: var(--success); grid-column: span 2; }
         .btn-save { background: var(--primary); width: 100%; margin-top: 10px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th { background: var(--light); padding: 10px; text-align: left; font-size: 0.8rem; color: #666; }
-        td { padding: 12px 10px; border-bottom: 1px solid #eee; font-size: 0.9rem; }
-        .summary { background: var(--dark); color: white; padding: 20px; border-radius: 15px; display: flex; justify-content: space-between; margin-top: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; min-width: 400px; }
+        th { background: var(--light); padding: 10px; text-align: left; font-size: 0.75rem; color: #666; }
+        td { padding: 12px 10px; border-bottom: 1px solid #eee; font-size: 0.85rem; }
+        .summary-grid { background: var(--dark); color: white; padding: 20px; border-radius: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px; }
+        .summary-item { border-bottom: 1px solid #444; padding-bottom: 5px; }
         .del-btn { color: var(--danger); background: none; font-size: 1.2rem; border: none; padding: 5px; }
+        .ot-text { color: var(--ot-color); font-weight: bold; }
+        .sat-text { color: var(--danger); font-weight: bold; font-size: 0.7rem; }
     </style>
 </head>
 <body>
@@ -30,7 +33,7 @@
 <div class="container">
     <div class="card">
         <h1>Work Pro ₪</h1>
-        <label style="font-size: 0.8rem;">ค่าแรง/ชม:</label>
+        <label style="font-size: 0.8rem;">ค่าแรงปกติ/ชม:</label>
         <input type="number" id="rate" value="38" oninput="renderData()">
     </div>
 
@@ -40,8 +43,7 @@
         <div id="statusLabel" class="status-badge">สถานะ: พร้อมเริ่มงาน</div>
         <div class="btn-grid">
             <button id="startBtn" class="btn-start" onclick="startWork()">เริ่มทำงาน</button>
-            <button id="breakBtn" style="display:none; background:var(--secondary);" onclick="toggleBreak()">พักเบรก</button>
-            <button id="endBtn" style="display:none; background:var(--danger);" onclick="endWork()">เลิกงาน</button>
+            <button id="endBtn" style="display:none; background:var(--danger); grid-column: span 2;" onclick="endWork()">เลิกงาน</button>
         </div>
     </div>
 
@@ -58,60 +60,100 @@
     </div>
 
     <div class="card" style="padding: 10px; overflow-x: auto;">
-        <h3>ประวัติ</h3>
+        <h3>ประวัติรายวัน</h3>
         <table>
-            <thead><tr><th>วันที่</th><th>ชม.</th><th>เงิน</th><th></th></tr></thead>
+            <thead>
+                <tr>
+                    <th>วันที่</th>
+                    <th>ชม.</th>
+                    <th>เงินปกติ</th>
+                    <th>โอที (OT)</th>
+                    <th>รวม/วัน</th>
+                    <th></th>
+                </tr>
+            </thead>
             <tbody id="tableBody"></tbody>
         </table>
     </div>
 
-    <div class="summary">
-        <div><small>ชม.รวม</small><br><span id="totalH" style="font-size: 1.4rem;">0.00</span></div>
-        <div style="text-align: right;"><small>เงินรวม</small><br><span style="font-size: 1.4rem; color: var(--success);">₪ <span id="totalP">0</span></span></div>
+    <div class="summary-grid">
+        <div class="summary-item"><small>ชม. รวมทั้งหมด</small><br><span id="totalH" style="font-size: 1.2rem;">0.00</span></div>
+        <div class="summary-item" style="text-align: right;"><small>เงินปกติรวม</small><br><span>₪ <span id="totalNormalP">0</span></span></div>
+        <div class="summary-item"><small>โอทีรวม</small><br><span class="ot-text">₪ <span id="totalOTP">0</span></span></div>
+        <div class="summary-item" style="text-align: right;"><small>รายรับสุทธิ</small><br><span style="font-size: 1.4rem; color: var(--success);">₪ <span id="totalP">0</span></span></div>
     </div>
 
-    <button onclick="clearSystem()" style="width:100%; background:none; color:#aaa; margin-top: 30px; font-size: 0.8rem; border: 1px solid #ddd;">รีเซ็ตระบบ</button>
+    <button onclick="clearSystem()" style="width:100%; background:none; color:#aaa; margin-top: 30px; font-size: 0.8rem; border: 1px solid #ddd; padding: 10px; border-radius: 10px;">รีเซ็ตระบบทั้งหมด</button>
 </div>
 
 <script>
-    // ตั้งค่าเริ่มต้น
     const getToday = () => new Date().toISOString().split('T')[0];
     document.getElementById('currentDate').value = getToday();
     document.getElementById('manualDate').value = getToday();
 
-    let workData = JSON.parse(localStorage.getItem('work_data_v2') || "{}");
+    let workData = JSON.parse(localStorage.getItem('work_data_v3') || "{}");
     let timerInterval;
     let startTime = null;
+
+    function isSaturday(dateString) {
+        const d = new Date(dateString);
+        return d.getDay() === 6; // 6 คือวันเสาร์
+    }
+
+    function calculateDetailedPay(h, r, isSat) {
+        let normalPay = 0, otPay = 0;
+        
+        if (isSat) {
+            // วันเสาร์: 8 ชม. แรก x 1.5, หลังจากนั้น x 1.75 (ตามมาตรฐานขั้นต่ำบางที่) 
+            // ในที่นี้ขออิง 1.5 เป็นฐานสำหรับวันหยุด
+            let satNormal = Math.min(8, h);
+            let satOT = Math.max(0, h - 8);
+            normalPay = satNormal * (r * 1.5);
+            otPay = satOT * (r * 1.75); // OT ในวันหยุด
+        } else {
+            // วันธรรมดา
+            let normalH = Math.min(8, h);
+            let ot125H = Math.max(0, Math.min(2, h - 8));
+            let ot150H = Math.max(0, h - 10);
+            
+            normalPay = normalH * r;
+            otPay = (ot125H * r * 1.25) + (ot150H * r * 1.5);
+        }
+        
+        return { normal: normalPay, ot: otPay, total: normalPay + otPay };
+    }
 
     function renderData() {
         const tbody = document.getElementById('tableBody');
         const rate = parseFloat(document.getElementById('rate').value) || 0;
-        let sumH = 0, sumP = 0;
+        let sumH = 0, sumNormalP = 0, sumOTP = 0;
         tbody.innerHTML = "";
 
         const sortedDates = Object.keys(workData).sort().reverse();
         sortedDates.forEach(date => {
             const h = parseFloat(workData[date]);
-            const p = calculateIsraelPay(h, rate);
-            sumH += h; sumP += p;
+            const sat = isSaturday(date);
+            const pay = calculateDetailedPay(h, rate, sat);
+            
+            sumH += h; 
+            sumNormalP += pay.normal;
+            sumOTP += pay.ot;
+
             tbody.innerHTML += `<tr>
-                <td>${date}</td>
+                <td>${date}${sat ? '<br><span class="sat-text">วันเสาร์</span>' : ''}</td>
                 <td>${h.toFixed(2)}</td>
-                <td>₪${Math.round(p)}</td>
+                <td>₪${Math.round(pay.normal)}</td>
+                <td class="ot-text">₪${Math.round(pay.ot)}</td>
+                <td style="font-weight:bold;">₪${Math.round(pay.total)}</td>
                 <td><button class="del-btn" onclick="deleteItem('${date}')">✕</button></td>
             </tr>`;
         });
 
         document.getElementById('totalH').innerText = sumH.toFixed(2);
-        document.getElementById('totalP').innerText = Math.round(sumP).toLocaleString();
-        localStorage.setItem('work_data_v2', JSON.stringify(workData));
-    }
-
-    function calculateIsraelPay(h, r) {
-        let normal = Math.min(8, h);
-        let ot125 = Math.max(0, Math.min(2, h - 8));
-        let ot150 = Math.max(0, h - 10);
-        return (normal * r) + (ot125 * r * 1.25) + (ot150 * r * 1.5);
+        document.getElementById('totalNormalP').innerText = Math.round(sumNormalP).toLocaleString();
+        document.getElementById('totalOTP').innerText = Math.round(sumOTP).toLocaleString();
+        document.getElementById('totalP').innerText = Math.round(sumNormalP + sumOTP).toLocaleString();
+        localStorage.setItem('work_data_v3', JSON.stringify(workData));
     }
 
     function saveManual() {
@@ -122,7 +164,6 @@
 
         if(!d || !tIn || !tOut) return alert("กรุณากรอกข้อมูลให้ครบ");
 
-        // คำนวณเวลาแบบรองรับ iOS
         const s = new Date(d.replace(/-/g, '/') + ' ' + tIn);
         let e = new Date(d.replace(/-/g, '/') + ' ' + tOut);
         if (e <= s) e.setDate(e.getDate() + 1);
@@ -136,7 +177,7 @@
     }
 
     function deleteItem(d) {
-        if(confirm('ลบรายการ?')) {
+        if(confirm('ลบรายการวันที่ ' + d + '?')) {
             delete workData[d];
             renderData();
         }
@@ -145,9 +186,8 @@
     function startWork() {
         startTime = new Date();
         document.getElementById('startBtn').style.display = 'none';
-        document.getElementById('breakBtn').style.display = 'block';
         document.getElementById('endBtn').style.display = 'block';
-        document.getElementById('statusLabel').innerText = "กำลังทำงาน...";
+        document.getElementById('statusLabel').innerText = "กำลังทำงาน (เริ่ม: " + startTime.toLocaleTimeString() + ")";
         timerInterval = setInterval(updateTimer, 1000);
     }
 
@@ -165,13 +205,17 @@
         if(!confirm("ต้องการบันทึกเวลาเลิกงาน?")) return;
         const diff = (new Date() - startTime) / 3600000;
         const d = document.getElementById('currentDate').value;
-        workData[d] = (parseFloat(workData[d] || 0) + diff).toFixed(2);
+        // ลอจิกหักพักอัตโนมัติ 0.5 ชม. ถ้าทำเกิน 6 ชม. (ตัวอย่าง)
+        let finalDiff = diff > 6 ? diff - 0.5 : diff;
+        
+        workData[d] = (parseFloat(workData[d] || 0) + finalDiff).toFixed(2);
         clearInterval(timerInterval);
+        renderData();
         location.reload();
     }
 
     function clearSystem() {
-        if(confirm("ล้างข้อมูลทั้งหมด?")) {
+        if(confirm("ล้างข้อมูลทั้งหมด? ข้อมูลจะหายถาวร!")) {
             localStorage.clear();
             location.reload();
         }
@@ -181,4 +225,3 @@
 </script>
 </body>
 </html>
-
