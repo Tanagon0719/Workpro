@@ -3,65 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Work Pro Israel - Custom Edition</title>
+    <title>Work Pro Israel - Safety Edition</title>
     <style>
-        :root {
-            --bg: #f0f2f5;
-            --card-bg: #ffffff;
-            --primary: #4e73df;
-            --success: #1cc88a;
-            --danger: #e74a3b;
-            --text-main: #2e3440;
-            --text-sub: #858796;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg);
-            color: var(--text-main);
-            margin: 0;
-            padding: 20px 15px;
-        }
-
+        :root { --bg: #f0f2f5; --card-bg: #ffffff; --primary: #4e73df; --success: #1cc88a; --danger: #e74a3b; --text-main: #2e3440; --text-sub: #858796; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg); color: var(--text-main); margin: 0; padding: 20px 15px; }
         .container { max-width: 480px; margin: 0 auto; }
-
-        .card {
-            background: var(--card-bg);
-            border-radius: 18px;
-            padding: 20px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.04);
-            margin-bottom: 15px;
-        }
-
+        .card { background: var(--card-bg); border-radius: 18px; padding: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.04); margin-bottom: 15px; border: 1px solid rgba(0,0,0,0.02); }
         .card-title { font-size: 0.75rem; font-weight: 800; color: var(--text-sub); text-transform: uppercase; margin-bottom: 12px; display: block; letter-spacing: 0.5px; }
-
-        input {
-            background: #f8f9fc;
-            border: 1px solid #d1d3e2;
-            padding: 12px;
-            border-radius: 10px;
-            width: 100%;
-            box-sizing: border-box;
-            font-size: 1rem;
-            margin-bottom: 10px;
-        }
-
-        .net-card {
-            background: linear-gradient(135deg, #1a1c23, #2d3436);
-            color: white;
-            padding: 25px;
-            border-radius: 22px;
-            text-align: center;
-        }
+        input { background: #f8f9fc; border: 1px solid #d1d3e2; padding: 12px; border-radius: 10px; width: 100%; box-sizing: border-box; font-size: 1rem; margin-bottom: 10px; }
+        .net-card { background: linear-gradient(135deg, #1a1c23, #2d3436); color: white; padding: 25px; border-radius: 22px; text-align: center; }
         .net-amount { font-size: 2.8rem; font-weight: 800; color: #00ff88; display: block; margin: 10px 0; }
-
         .timer-display { font-size: 3.2rem; font-weight: 800; text-align: center; margin: 15px 0; color: var(--primary); font-family: monospace; }
-
-        .btn { padding: 16px; border: none; border-radius: 12px; font-weight: 700; width: 100%; cursor: pointer; }
+        .btn { padding: 16px; border: none; border-radius: 12px; font-weight: 700; width: 100%; cursor: pointer; margin-bottom: 10px; }
         .btn-success { background: var(--success); color: white; }
         .btn-danger { background: var(--danger); color: white; }
         .btn-primary { background: var(--primary); color: white; }
-
+        .btn-outline { background: none; border: 1px solid var(--text-sub); color: var(--text-sub); padding: 10px; font-size: 0.8rem; }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         table { width: 100%; border-collapse: collapse; }
         th { text-align: left; font-size: 0.7rem; color: var(--text-sub); padding: 10px; border-bottom: 1px solid #eaecf4; }
@@ -83,6 +40,7 @@
             <div>ชั่วโมงรวม: <b id="totalHDisplay">0</b></div>
             <div>ยอดก่อนหัก: <b id="grossDisplay">0</b></div>
         </div>
+        <button onclick="copySummary()" style="background:rgba(255,255,255,0.1); border:none; color:white; padding:5px 10px; border-radius:5px; font-size:0.7rem; margin-top:10px; cursor:pointer;">📋 ก๊อปปี้สรุปยอดส่ง LINE</button>
     </div>
 
     <div class="card" style="margin-top: 15px;">
@@ -106,33 +64,27 @@
     </div>
 
     <div class="card">
-        <span class="card-title">⚙️ ตั้งค่า (กรอกเองตามสลิปแต่ละเดือน)</span>
+        <span class="card-title">⚙️ ตั้งค่ารายเดือน</span>
         <div class="grid-2">
             <div><label style="font-size: 0.65rem;">ค่าแรง/ชม.</label><input type="number" id="rate" value="38" oninput="renderData()"></div>
-            <div><label style="font-size: 0.65rem;">รายได้เสริม (อาหาร)</label><input type="number" id="bonus" value="0" oninput="renderData()"></div>
+            <div><label style="font-size: 0.65rem;">รายได้เสริม</label><input type="number" id="bonus" value="0" oninput="renderData()"></div>
         </div>
-        <label style="font-size: 0.65rem; color: var(--danger);">ยอดหักรวม (ที่โดนลบออกในเดือนนั้น)</label>
-        <input type="number" id="totalDeduction" value="0" oninput="renderData()" style="color: var(--danger);">
+        <label style="font-size: 0.65rem;">ยอดหักรวม</label>
+        <input type="number" id="totalDeduction" value="0" oninput="renderData()">
     </div>
 
     <div class="card" style="padding: 10px; overflow-x: auto;">
-        <span class="card-title" style="padding: 10px;">รายการทำงานประจำเดือน</span>
         <table>
-            <thead>
-                <tr>
-                    <th>วันที่</th>
-                    <th>ชม.</th>
-                    <th>ปกติ</th>
-                    <th>โอที</th>
-                    <th>รวม</th>
-                    <th></th>
-                </tr>
-            </thead>
+            <thead><tr><th>วันที่</th><th>ชม.</th><th>ปกติ</th><th>โอที</th><th>รวม</th><th></th></tr></thead>
             <tbody id="tableBody"></tbody>
         </table>
     </div>
 
-    <button onclick="clearSystem()" style="width:100%; background:none; color:var(--text-sub); border:none; padding: 20px; font-size: 0.8rem;">ล้างข้อมูลทั้งหมด</button>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+        <button onclick="backupData()" class="btn btn-outline">📥 สำรองข้อมูลลงโน้ต</button>
+        <button onclick="restoreData()" class="btn btn-outline">📤 กู้คืนข้อมูล</button>
+    </div>
+    <button onclick="clearSystem()" style="width:100%; background:none; color:#ccc; border:none; padding: 20px; font-size: 0.7rem;">ล้างข้อมูลทั้งหมด</button>
 </div>
 
 <script>
@@ -150,43 +102,52 @@
         const bonus = parseFloat(document.getElementById('bonus').value) || 0;
         const deduct = parseFloat(document.getElementById('totalDeduction').value) || 0;
         const selectedMonth = document.getElementById('monthFilter').value;
-        
         let sumH = 0, totalGross = 0;
         tbody.innerHTML = "";
-
         Object.keys(workData).sort().reverse().forEach(date => {
             if (date.startsWith(selectedMonth)) {
                 const h = parseFloat(workData[date]);
                 const isSat = new Date(date).getDay() === 6;
-                let normalPay = 0, otPay = 0;
-
-                if (isSat) {
-                    normalPay = Math.min(8, h) * (rate * 1.5);
-                    otPay = Math.max(0, h - 8) * (rate * 1.75);
-                } else {
-                    normalPay = Math.min(8, h) * rate;
-                    otPay = (Math.max(0, Math.min(2, h - 8)) * rate * 1.25) + (Math.max(0, h - 10) * rate * 1.5);
-                }
-
-                sumH += h;
-                totalGross += (normalPay + otPay);
-                tbody.innerHTML += `<tr><td>${date.split('-')[2]}/${date.split('-')[1]} ${isSat?'<br><span style="color:red;font-size:0.6rem;">SAT</span>':''}</td><td style="font-weight:700;">${h.toFixed(2)}</td><td>${Math.round(normalPay)}</td><td style="color:#6f42c1;font-weight:bold;">${Math.round(otPay)}</td><td style="font-weight:800;">₪${Math.round(normalPay + otPay)}</td><td><button onclick="deleteItem('${date}')" style="color:#ccc;border:none;background:none;font-size:1.2rem;">✕</button></td></tr>`;
+                let np = 0, op = 0;
+                if (isSat) { np = Math.min(8, h) * rate * 1.5; op = Math.max(0, h-8) * rate * 1.75; }
+                else { np = Math.min(8, h) * rate; op = (Math.max(0, Math.min(2, h-8)) * rate * 1.25) + (Math.max(0, h-10) * rate * 1.5); }
+                sumH += h; totalGross += (np + op);
+                tbody.innerHTML += `<tr><td>${date.split('-')[2]}/${date.split('-')[1]} ${isSat?'<br><small style="color:red">SAT</small>':''}</td><td>${h.toFixed(2)}</td><td>${Math.round(np)}</td><td style="color:purple">${Math.round(op)}</td><td style="font-weight:bold">₪${Math.round(np+op)}</td><td><button onclick="deleteItem('${date}')" style="color:#ccc;border:none;background:none">✕</button></td></tr>`;
             }
         });
-
         document.getElementById('totalHDisplay').innerText = sumH.toFixed(2) + " ชม.";
         document.getElementById('grossDisplay').innerText = "₪" + Math.round(totalGross + bonus).toLocaleString();
         document.getElementById('netDisplay').innerText = Math.round(totalGross + bonus - deduct).toLocaleString();
         localStorage.setItem('work_data_v2', JSON.stringify(workData));
     }
 
-    function saveManual() {
-        const d = document.getElementById('manualDate').value;
-        const start = new Date(d.replace(/-/g, '/') + ' ' + document.getElementById('timeIn').value);
-        let end = new Date(d.replace(/-/g, '/') + ' ' + document.getElementById('timeOut').value);
-        if (end <= start) end.setDate(end.getDate() + 1);
-        const diff = (end - start) / 3600000 - parseFloat(document.getElementById('manualBreak').value);
-        if(diff > 0) { workData[d] = (parseFloat(workData[d] || 0) + diff).toFixed(2); renderData(); alert("บันทึกแล้ว"); }
+    function backupData() {
+        const dataStr = JSON.stringify(workData);
+        navigator.clipboard.writeText(dataStr).then(() => {
+            alert("คัดลอกรหัสข้อมูลสำเร็จ! กรุณานำไป 'วาง' ในแอป Note หรือส่งเข้า LINE ตัวเองเพื่อเก็บไว้");
+        });
+    }
+
+    function restoreData() {
+        const dataStr = prompt("วางรหัสข้อมูลที่เคยสำรองไว้ที่นี่:");
+        if (dataStr) {
+            try {
+                const parsed = JSON.parse(dataStr);
+                if (confirm("ต้องการกู้คืนข้อมูลหรือไม่? ข้อมูลปัจจุบันจะถูกเขียนทับ")) {
+                    workData = parsed;
+                    renderData();
+                    alert("กู้คืนข้อมูลสำเร็จ!");
+                }
+            } catch(e) { alert("รหัสข้อมูลไม่ถูกต้อง"); }
+        }
+    }
+
+    function copySummary() {
+        const month = document.getElementById('monthFilter').value;
+        const net = document.getElementById('netDisplay').innerText;
+        const h = document.getElementById('totalHDisplay').innerText;
+        const msg = `📊 สรุปงานเดือน ${month}\n⏱️ ชั่วโมงรวม: ${h}\n💰 เงินสุทธิ: ₪${net}\n(จดบันทึกผ่าน Work Pro)`;
+        navigator.clipboard.writeText(msg).then(() => alert("คัดลอกสรุปยอดแล้ว! นำไปวางส่งใน LINE ได้เลย"));
     }
 
     function startWork() {
@@ -203,12 +164,21 @@
     }
 
     function endWork() {
-        if(!confirm("บันทึกเวลาเลิกงาน? (หักพัก 30 นาที)")) return;
+        if(!confirm("บันทึกเลิกงาน? (หักพัก 30น.)")) return;
         const diff = (new Date() - startTime) / 3600000;
-        let finalDiff = diff > 0.5 ? diff - 0.5 : diff;
-        workData[document.getElementById('currentDate').value] = (parseFloat(workData[document.getElementById('currentDate').value] || 0) + finalDiff).toFixed(2);
+        const final = diff > 0.5 ? diff - 0.5 : diff;
+        workData[document.getElementById('currentDate').value] = (parseFloat(workData[document.getElementById('currentDate').value] || 0) + final).toFixed(2);
         clearInterval(timerInterval);
         location.reload();
+    }
+
+    function saveManual() {
+        const d = document.getElementById('manualDate').value;
+        const s = new Date(d.replace(/-/g, '/') + ' ' + document.getElementById('timeIn').value);
+        let e = new Date(d.replace(/-/g, '/') + ' ' + document.getElementById('timeOut').value);
+        if (e <= s) e.setDate(e.getDate() + 1);
+        const diff = (e - s) / 3600000 - parseFloat(document.getElementById('manualBreak').value);
+        if(diff > 0) { workData[d] = (parseFloat(workData[d] || 0) + diff).toFixed(2); renderData(); alert("บันทึกสำเร็จ"); }
     }
 
     function deleteItem(d) { if(confirm('ลบ?')) { delete workData[d]; renderData(); } }
