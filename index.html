@@ -3,48 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Work Pro Israel - Safety Edition</title>
+    <title>Work Pro Israel - Classic Layout</title>
     <style>
-        :root { --bg: #f0f2f5; --card-bg: #ffffff; --primary: #4e73df; --success: #1cc88a; --danger: #e74a3b; --text-main: #2e3440; --text-sub: #858796; }
+        :root { --bg: #f0f2f5; --card-bg: #ffffff; --primary: #4e73df; --success: #1cc88a; --danger: #e74a3b; --text-main: #2e3440; --text-sub: #858796; --ot-purple: #6f42c1; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg); color: var(--text-main); margin: 0; padding: 20px 15px; }
         .container { max-width: 480px; margin: 0 auto; }
         .card { background: var(--card-bg); border-radius: 18px; padding: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.04); margin-bottom: 15px; border: 1px solid rgba(0,0,0,0.02); }
         .card-title { font-size: 0.75rem; font-weight: 800; color: var(--text-sub); text-transform: uppercase; margin-bottom: 12px; display: block; letter-spacing: 0.5px; }
         input { background: #f8f9fc; border: 1px solid #d1d3e2; padding: 12px; border-radius: 10px; width: 100%; box-sizing: border-box; font-size: 1rem; margin-bottom: 10px; }
-        .net-card { background: linear-gradient(135deg, #1a1c23, #2d3436); color: white; padding: 25px; border-radius: 22px; text-align: center; }
-        .net-amount { font-size: 2.8rem; font-weight: 800; color: #00ff88; display: block; margin: 10px 0; }
         .timer-display { font-size: 3.2rem; font-weight: 800; text-align: center; margin: 15px 0; color: var(--primary); font-family: monospace; }
-        .btn { padding: 16px; border: none; border-radius: 12px; font-weight: 700; width: 100%; cursor: pointer; margin-bottom: 10px; }
+        .btn { padding: 16px; border: none; border-radius: 12px; font-weight: 700; width: 100%; cursor: pointer; margin-bottom: 10px; transition: 0.2s; }
         .btn-success { background: var(--success); color: white; }
         .btn-danger { background: var(--danger); color: white; }
         .btn-primary { background: var(--primary); color: white; }
-        .btn-outline { background: none; border: 1px solid var(--text-sub); color: var(--text-sub); padding: 10px; font-size: 0.8rem; }
+        .btn-outline { background: none; border: 1px solid var(--text-sub); color: var(--text-sub); padding: 10px; font-size: 0.8rem; border-radius: 10px; }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         table { width: 100%; border-collapse: collapse; }
         th { text-align: left; font-size: 0.7rem; color: var(--text-sub); padding: 10px; border-bottom: 1px solid #eaecf4; }
         td { padding: 12px 10px; font-size: 0.85rem; border-bottom: 1px solid #f8f9fc; }
+        
+        /* สรุปเงินด้านล่าง */
+        .summary-card { background: linear-gradient(135deg, #1a1c23, #2d3436); color: white; padding: 25px; border-radius: 22px; text-align: center; margin-top: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .net-label { opacity: 0.7; font-size: 0.9rem; display: block; }
+        .net-amount { font-size: 3rem; font-weight: 800; color: #00ff88; display: block; margin: 5px 0; }
+        .sat-text { color: var(--danger); font-size: 0.6rem; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="card" style="border-left: 5px solid var(--primary);">
-        <span class="card-title">📅 เรียกดูรายเดือน</span>
+        <span class="card-title">📅 ประจำเดือน</span>
         <input type="month" id="monthFilter" onchange="renderData()">
     </div>
 
-    <div class="net-card">
-        <span style="opacity: 0.7; font-size: 0.9rem;">รายได้สุทธิ (Net Pay)</span>
-        <span class="net-amount">₪ <span id="netDisplay">0</span></span>
-        <div style="display: flex; justify-content: space-around; font-size: 0.8rem; opacity: 0.9; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
-            <div>ชั่วโมงรวม: <b id="totalHDisplay">0</b></div>
-            <div>ยอดก่อนหัก: <b id="grossDisplay">0</b></div>
-        </div>
-        <button onclick="copySummary()" style="background:rgba(255,255,255,0.1); border:none; color:white; padding:5px 10px; border-radius:5px; font-size:0.7rem; margin-top:10px; cursor:pointer;">📋 ก๊อปปี้สรุปยอดส่ง LINE</button>
-    </div>
-
-    <div class="card" style="margin-top: 15px;">
-        <span class="card-title">🕒 บันทึกเวลาทำงาน</span>
+    <div class="card">
+        <span class="card-title">🕒 บันทึกเวลาปัจจุบัน</span>
         <input type="date" id="currentDate">
         <div class="timer-display" id="timerDisplay">00:00:00</div>
         <button id="startBtn" class="btn btn-success" onclick="startWork()">เริ่มงาน</button>
@@ -55,10 +49,10 @@
         <span class="card-title">📝 บันทึกย้อนหลัง</span>
         <input type="date" id="manualDate">
         <div class="grid-2">
-            <div><label style="font-size:0.65rem;">เริ่ม</label><input type="time" id="timeIn" value="06:00"></div>
-            <div><label style="font-size:0.65rem;">เลิก</label><input type="time" id="timeOut" value="17:00"></div>
+            <div><label style="font-size:0.6rem;">เริ่ม</label><input type="time" id="timeIn" value="06:00"></div>
+            <div><label style="font-size:0.6rem;">เลิก</label><input type="time" id="timeOut" value="17:00"></div>
         </div>
-        <label style="font-size:0.65rem;">เวลาพัก (ชม.)</label>
+        <label style="font-size:0.6rem;">หักเวลาพัก (ชม.)</label>
         <input type="number" id="manualBreak" value="0.5" step="0.1">
         <button class="btn btn-primary" onclick="saveManual()">บันทึกข้อมูล</button>
     </div>
@@ -69,21 +63,33 @@
             <div><label style="font-size: 0.65rem;">ค่าแรง/ชม.</label><input type="number" id="rate" value="38" oninput="renderData()"></div>
             <div><label style="font-size: 0.65rem;">รายได้เสริม</label><input type="number" id="bonus" value="0" oninput="renderData()"></div>
         </div>
-        <label style="font-size: 0.65rem;">ยอดหักรวม</label>
+        <label style="font-size: 0.65rem;">ยอดหักรวม (ภาษี/น้ำไฟ)</label>
         <input type="number" id="totalDeduction" value="0" oninput="renderData()">
     </div>
 
     <div class="card" style="padding: 10px; overflow-x: auto;">
+        <span class="card-title" style="padding: 10px;">รายการทำงาน</span>
         <table>
             <thead><tr><th>วันที่</th><th>ชม.</th><th>ปกติ</th><th>โอที</th><th>รวม</th><th></th></tr></thead>
             <tbody id="tableBody"></tbody>
         </table>
     </div>
 
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
-        <button onclick="backupData()" class="btn btn-outline">📥 สำรองข้อมูลลงโน้ต</button>
-        <button onclick="restoreData()" class="btn btn-outline">📤 กู้คืนข้อมูล</button>
+    <div class="summary-card">
+        <span class="net-label">รายได้สุทธิประจำเดือน</span>
+        <span class="net-amount">₪ <span id="netDisplay">0</span></span>
+        <div style="display: flex; justify-content: space-around; font-size: 0.8rem; opacity: 0.9; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; margin-bottom: 10px;">
+            <div>ชั่วโมงรวม: <b id="totalHDisplay">0</b></div>
+            <div>ยอดก่อนหัก: <b id="grossDisplay">0</b></div>
+        </div>
+        <button onclick="copySummary()" style="background:rgba(255,255,255,0.1); border:none; color:white; padding:8px 15px; border-radius:8px; font-size:0.75rem; cursor:pointer; width:100%;">📋 ก๊อปปี้สรุปยอดส่ง LINE</button>
     </div>
+
+    <div class="grid-2" style="margin-top: 15px;">
+        <button onclick="backupData()" class="btn-outline">📥 สำรองลง Note</button>
+        <button onclick="restoreData()" class="btn-outline">📤 กู้คืนข้อมูล</button>
+    </div>
+    
     <button onclick="clearSystem()" style="width:100%; background:none; color:#ccc; border:none; padding: 20px; font-size: 0.7rem;">ล้างข้อมูลทั้งหมด</button>
 </div>
 
@@ -104,15 +110,21 @@
         const selectedMonth = document.getElementById('monthFilter').value;
         let sumH = 0, totalGross = 0;
         tbody.innerHTML = "";
+
         Object.keys(workData).sort().reverse().forEach(date => {
             if (date.startsWith(selectedMonth)) {
                 const h = parseFloat(workData[date]);
                 const isSat = new Date(date).getDay() === 6;
                 let np = 0, op = 0;
-                if (isSat) { np = Math.min(8, h) * rate * 1.5; op = Math.max(0, h-8) * rate * 1.75; }
-                else { np = Math.min(8, h) * rate; op = (Math.max(0, Math.min(2, h-8)) * rate * 1.25) + (Math.max(0, h-10) * rate * 1.5); }
+                if (isSat) { 
+                    np = Math.min(8, h) * rate * 1.5; 
+                    op = Math.max(0, h-8) * rate * 1.75; 
+                } else { 
+                    np = Math.min(8, h) * rate; 
+                    op = (Math.max(0, Math.min(2, h-8)) * rate * 1.25) + (Math.max(0, h-10) * rate * 1.5); 
+                }
                 sumH += h; totalGross += (np + op);
-                tbody.innerHTML += `<tr><td>${date.split('-')[2]}/${date.split('-')[1]} ${isSat?'<br><small style="color:red">SAT</small>':''}</td><td>${h.toFixed(2)}</td><td>${Math.round(np)}</td><td style="color:purple">${Math.round(op)}</td><td style="font-weight:bold">₪${Math.round(np+op)}</td><td><button onclick="deleteItem('${date}')" style="color:#ccc;border:none;background:none">✕</button></td></tr>`;
+                tbody.innerHTML += `<tr><td>${date.split('-')[2]}/${date.split('-')[1]} ${isSat?'<br><span class="sat-text">SAT</span>':''}</td><td style="font-weight:700;">${h.toFixed(2)}</td><td>${Math.round(np)}</td><td style="color:purple;font-weight:bold;">${Math.round(op)}</td><td style="font-weight:800;">₪${Math.round(np+op)}</td><td><button onclick="deleteItem('${date}')" style="color:#ccc;border:none;background:none;font-size:1.2rem;">✕</button></td></tr>`;
             }
         });
         document.getElementById('totalHDisplay').innerText = sumH.toFixed(2) + " ชม.";
@@ -122,32 +134,17 @@
     }
 
     function backupData() {
-        const dataStr = JSON.stringify(workData);
-        navigator.clipboard.writeText(dataStr).then(() => {
-            alert("คัดลอกรหัสข้อมูลสำเร็จ! กรุณานำไป 'วาง' ในแอป Note หรือส่งเข้า LINE ตัวเองเพื่อเก็บไว้");
-        });
+        navigator.clipboard.writeText(JSON.stringify(workData)).then(() => alert("คัดลอกรหัสข้อมูลแล้ว! นำไปวางในแอป Note เก็บไว้ได้เลย"));
     }
 
     function restoreData() {
-        const dataStr = prompt("วางรหัสข้อมูลที่เคยสำรองไว้ที่นี่:");
-        if (dataStr) {
-            try {
-                const parsed = JSON.parse(dataStr);
-                if (confirm("ต้องการกู้คืนข้อมูลหรือไม่? ข้อมูลปัจจุบันจะถูกเขียนทับ")) {
-                    workData = parsed;
-                    renderData();
-                    alert("กู้คืนข้อมูลสำเร็จ!");
-                }
-            } catch(e) { alert("รหัสข้อมูลไม่ถูกต้อง"); }
-        }
+        const data = prompt("วางรหัสข้อมูลเพื่อกู้คืน:");
+        if (data) { try { workData = JSON.parse(data); renderData(); alert("กู้คืนสำเร็จ!"); } catch(e) { alert("รหัสไม่ถูกต้อง"); } }
     }
 
     function copySummary() {
-        const month = document.getElementById('monthFilter').value;
-        const net = document.getElementById('netDisplay').innerText;
-        const h = document.getElementById('totalHDisplay').innerText;
-        const msg = `📊 สรุปงานเดือน ${month}\n⏱️ ชั่วโมงรวม: ${h}\n💰 เงินสุทธิ: ₪${net}\n(จดบันทึกผ่าน Work Pro)`;
-        navigator.clipboard.writeText(msg).then(() => alert("คัดลอกสรุปยอดแล้ว! นำไปวางส่งใน LINE ได้เลย"));
+        const msg = `📊 สรุปงานเดือน ${document.getElementById('monthFilter').value}\n⏱️ ชม.รวม: ${document.getElementById('totalHDisplay').innerText}\n💰 สุทธิ: ₪${document.getElementById('netDisplay').innerText}`;
+        navigator.clipboard.writeText(msg).then(() => alert("ก๊อปปี้สรุปยอดแล้ว!"));
     }
 
     function startWork() {
