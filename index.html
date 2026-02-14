@@ -3,72 +3,128 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Work Pro Israel V2</title>
+    <title>Work Pro Israel - Custom Edition</title>
     <style>
-        :root { --primary: #4a90e2; --secondary: #f39c12; --danger: #e74c3c; --success: #2ecc71; --dark: #2c3e50; --light: #f8f9fa; --ot-color: #9b59b6; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #eef2f7; margin: 0; padding: 15px; }
-        .container { width: 100%; max-width: 600px; margin: 0 auto; }
-        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 15px; }
-        h1, h3 { color: var(--dark); text-align: center; margin: 0 0 15px 0; }
-        .timer-display { font-size: 3rem; font-weight: bold; color: var(--primary); text-align: center; margin: 10px 0; font-family: monospace; }
-        .status-badge { display: block; text-align: center; padding: 8px; border-radius: 20px; background: #eee; font-size: 0.9rem; margin-bottom: 15px; font-weight: bold; }
-        input { padding: 12px; border: 1px solid #ddd; border-radius: 8px; width: 100%; box-sizing: border-box; font-size: 1rem; margin-top: 5px; }
-        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        button { padding: 15px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 1rem; color: white; transition: 0.2s; }
-        button:active { opacity: 0.7; transform: scale(0.98); }
-        .btn-start { background: var(--success); grid-column: span 2; }
-        .btn-save { background: var(--primary); width: 100%; margin-top: 10px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; min-width: 400px; }
-        th { background: var(--light); padding: 10px; text-align: left; font-size: 0.75rem; color: #666; }
-        td { padding: 12px 10px; border-bottom: 1px solid #eee; font-size: 0.85rem; }
-        .summary-grid { background: var(--dark); color: white; padding: 20px; border-radius: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px; }
-        .summary-item { border-bottom: 1px solid #444; padding-bottom: 5px; }
-        .del-btn { color: var(--danger); background: none; font-size: 1.2rem; border: none; padding: 5px; }
-        .ot-text { color: var(--ot-color); font-weight: bold; }
-        .sat-text { color: var(--danger); font-weight: bold; font-size: 0.7rem; }
+        :root {
+            --bg: #f0f2f5;
+            --card-bg: #ffffff;
+            --primary: #4e73df;
+            --success: #1cc88a;
+            --danger: #e74a3b;
+            --text-main: #2e3440;
+            --text-sub: #858796;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px 15px;
+        }
+
+        .container { max-width: 480px; margin: 0 auto; }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 18px;
+            padding: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.04);
+            margin-bottom: 15px;
+        }
+
+        .card-title { font-size: 0.75rem; font-weight: 800; color: var(--text-sub); text-transform: uppercase; margin-bottom: 12px; display: block; letter-spacing: 0.5px; }
+
+        input {
+            background: #f8f9fc;
+            border: 1px solid #d1d3e2;
+            padding: 12px;
+            border-radius: 10px;
+            width: 100%;
+            box-sizing: border-box;
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+
+        .net-card {
+            background: linear-gradient(135deg, #1a1c23, #2d3436);
+            color: white;
+            padding: 25px;
+            border-radius: 22px;
+            text-align: center;
+        }
+        .net-amount { font-size: 2.8rem; font-weight: 800; color: #00ff88; display: block; margin: 10px 0; }
+
+        .timer-display { font-size: 3.2rem; font-weight: 800; text-align: center; margin: 15px 0; color: var(--primary); font-family: monospace; }
+
+        .btn { padding: 16px; border: none; border-radius: 12px; font-weight: 700; width: 100%; cursor: pointer; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-primary { background: var(--primary); color: white; }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; font-size: 0.7rem; color: var(--text-sub); padding: 10px; border-bottom: 1px solid #eaecf4; }
+        td { padding: 12px 10px; font-size: 0.85rem; border-bottom: 1px solid #f8f9fc; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="card">
-        <h1>Work Pro ₪</h1>
-        <label style="font-size: 0.8rem;">ค่าแรงปกติ/ชม:</label>
-        <input type="number" id="rate" value="38" oninput="renderData()">
+    <div class="card" style="border-left: 5px solid var(--primary);">
+        <span class="card-title">📅 เรียกดูรายเดือน</span>
+        <input type="month" id="monthFilter" onchange="renderData()">
     </div>
 
-    <div class="card">
+    <div class="net-card">
+        <span style="opacity: 0.7; font-size: 0.9rem;">รายได้สุทธิ (Net Pay)</span>
+        <span class="net-amount">₪ <span id="netDisplay">0</span></span>
+        <div style="display: flex; justify-content: space-around; font-size: 0.8rem; opacity: 0.9; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+            <div>ชั่วโมงรวม: <b id="totalHDisplay">0</b></div>
+            <div>ยอดก่อนหัก: <b id="grossDisplay">0</b></div>
+        </div>
+    </div>
+
+    <div class="card" style="margin-top: 15px;">
+        <span class="card-title">🕒 บันทึกเวลาทำงาน</span>
         <input type="date" id="currentDate">
         <div class="timer-display" id="timerDisplay">00:00:00</div>
-        <div id="statusLabel" class="status-badge">สถานะ: พร้อมเริ่มงาน</div>
-        <div class="btn-grid">
-            <button id="startBtn" class="btn-start" onclick="startWork()">เริ่มทำงาน</button>
-            <button id="endBtn" style="display:none; background:var(--danger); grid-column: span 2;" onclick="endWork()">เลิกงาน</button>
+        <button id="startBtn" class="btn btn-success" onclick="startWork()">เริ่มงาน</button>
+        <button id="endBtn" class="btn btn-danger" style="display:none;" onclick="endWork()">เลิกงาน (หักพัก 30น.)</button>
+    </div>
+
+    <div class="card" style="background:#fdfdfd; border: 1px dashed #d1d3e2;">
+        <span class="card-title">📝 บันทึกย้อนหลัง</span>
+        <input type="date" id="manualDate">
+        <div class="grid-2">
+            <div><label style="font-size:0.65rem;">เริ่ม</label><input type="time" id="timeIn" value="06:00"></div>
+            <div><label style="font-size:0.65rem;">เลิก</label><input type="time" id="timeOut" value="17:00"></div>
         </div>
+        <label style="font-size:0.65rem;">เวลาพัก (ชม.)</label>
+        <input type="number" id="manualBreak" value="0.5" step="0.1">
+        <button class="btn btn-primary" onclick="saveManual()">บันทึกข้อมูล</button>
     </div>
 
     <div class="card">
-        <h3>เพิ่มย้อนหลัง</h3>
-        <label style="font-size: 0.8rem;">วันที่:</label>
-        <input type="date" id="manualDate">
-        <div style="display: flex; gap: 10px; margin-top: 10px;">
-            <div style="flex:1;"><label style="font-size: 0.7rem;">เริ่ม:</label><input type="time" id="timeIn" value="06:00"></div>
-            <div style="flex:1;"><label style="font-size: 0.7rem;">เลิก:</label><input type="time" id="timeOut" value="17:00"></div>
-            <div style="flex:1;"><label style="font-size: 0.7rem;">พัก(ชม):</label><input type="number" id="manualBreak" value="0.5" step="0.1"></div>
+        <span class="card-title">⚙️ ตั้งค่า (กรอกเองตามสลิปแต่ละเดือน)</span>
+        <div class="grid-2">
+            <div><label style="font-size: 0.65rem;">ค่าแรง/ชม.</label><input type="number" id="rate" value="38" oninput="renderData()"></div>
+            <div><label style="font-size: 0.65rem;">รายได้เสริม (อาหาร)</label><input type="number" id="bonus" value="0" oninput="renderData()"></div>
         </div>
-        <button class="btn-save" onclick="saveManual()">บันทึกย้อนหลัง</button>
+        <label style="font-size: 0.65rem; color: var(--danger);">ยอดหักรวม (ที่โดนลบออกในเดือนนั้น)</label>
+        <input type="number" id="totalDeduction" value="0" oninput="renderData()" style="color: var(--danger);">
     </div>
 
     <div class="card" style="padding: 10px; overflow-x: auto;">
-        <h3>ประวัติรายวัน</h3>
+        <span class="card-title" style="padding: 10px;">รายการทำงานประจำเดือน</span>
         <table>
             <thead>
                 <tr>
                     <th>วันที่</th>
                     <th>ชม.</th>
-                    <th>เงินปกติ</th>
-                    <th>โอที (OT)</th>
-                    <th>รวม/วัน</th>
+                    <th>ปกติ</th>
+                    <th>โอที</th>
+                    <th>รวม</th>
                     <th></th>
                 </tr>
             </thead>
@@ -76,151 +132,87 @@
         </table>
     </div>
 
-    <div class="summary-grid">
-        <div class="summary-item"><small>ชม. รวมทั้งหมด</small><br><span id="totalH" style="font-size: 1.2rem;">0.00</span></div>
-        <div class="summary-item" style="text-align: right;"><small>เงินปกติรวม</small><br><span>₪ <span id="totalNormalP">0</span></span></div>
-        <div class="summary-item"><small>โอทีรวม</small><br><span class="ot-text">₪ <span id="totalOTP">0</span></span></div>
-        <div class="summary-item" style="text-align: right;"><small>รายรับสุทธิ</small><br><span style="font-size: 1.4rem; color: var(--success);">₪ <span id="totalP">0</span></span></div>
-    </div>
-
-    <button onclick="clearSystem()" style="width:100%; background:none; color:#aaa; margin-top: 30px; font-size: 0.8rem; border: 1px solid #ddd; padding: 10px; border-radius: 10px;">รีเซ็ตระบบทั้งหมด</button>
+    <button onclick="clearSystem()" style="width:100%; background:none; color:var(--text-sub); border:none; padding: 20px; font-size: 0.8rem;">ล้างข้อมูลทั้งหมด</button>
 </div>
 
 <script>
-    const getToday = () => new Date().toISOString().split('T')[0];
-    document.getElementById('currentDate').value = getToday();
-    document.getElementById('manualDate').value = getToday();
+    const now = new Date();
+    document.getElementById('monthFilter').value = now.toISOString().substring(0, 7);
+    document.getElementById('currentDate').value = now.toISOString().split('T')[0];
+    document.getElementById('manualDate').value = now.toISOString().split('T')[0];
 
-    let workData = JSON.parse(localStorage.getItem('work_data_v3') || "{}");
-    let timerInterval;
-    let startTime = null;
-
-    function isSaturday(dateString) {
-        const d = new Date(dateString);
-        return d.getDay() === 6; // 6 คือวันเสาร์
-    }
-
-    function calculateDetailedPay(h, r, isSat) {
-        let normalPay = 0, otPay = 0;
-        
-        if (isSat) {
-            // วันเสาร์: 8 ชม. แรก x 1.5, หลังจากนั้น x 1.75 (ตามมาตรฐานขั้นต่ำบางที่) 
-            // ในที่นี้ขออิง 1.5 เป็นฐานสำหรับวันหยุด
-            let satNormal = Math.min(8, h);
-            let satOT = Math.max(0, h - 8);
-            normalPay = satNormal * (r * 1.5);
-            otPay = satOT * (r * 1.75); // OT ในวันหยุด
-        } else {
-            // วันธรรมดา
-            let normalH = Math.min(8, h);
-            let ot125H = Math.max(0, Math.min(2, h - 8));
-            let ot150H = Math.max(0, h - 10);
-            
-            normalPay = normalH * r;
-            otPay = (ot125H * r * 1.25) + (ot150H * r * 1.5);
-        }
-        
-        return { normal: normalPay, ot: otPay, total: normalPay + otPay };
-    }
+    let workData = JSON.parse(localStorage.getItem('work_data_v2') || "{}");
+    let timerInterval, startTime = null;
 
     function renderData() {
         const tbody = document.getElementById('tableBody');
         const rate = parseFloat(document.getElementById('rate').value) || 0;
-        let sumH = 0, sumNormalP = 0, sumOTP = 0;
+        const bonus = parseFloat(document.getElementById('bonus').value) || 0;
+        const deduct = parseFloat(document.getElementById('totalDeduction').value) || 0;
+        const selectedMonth = document.getElementById('monthFilter').value;
+        
+        let sumH = 0, totalGross = 0;
         tbody.innerHTML = "";
 
-        const sortedDates = Object.keys(workData).sort().reverse();
-        sortedDates.forEach(date => {
-            const h = parseFloat(workData[date]);
-            const sat = isSaturday(date);
-            const pay = calculateDetailedPay(h, rate, sat);
-            
-            sumH += h; 
-            sumNormalP += pay.normal;
-            sumOTP += pay.ot;
+        Object.keys(workData).sort().reverse().forEach(date => {
+            if (date.startsWith(selectedMonth)) {
+                const h = parseFloat(workData[date]);
+                const isSat = new Date(date).getDay() === 6;
+                let normalPay = 0, otPay = 0;
 
-            tbody.innerHTML += `<tr>
-                <td>${date}${sat ? '<br><span class="sat-text">วันเสาร์</span>' : ''}</td>
-                <td>${h.toFixed(2)}</td>
-                <td>₪${Math.round(pay.normal)}</td>
-                <td class="ot-text">₪${Math.round(pay.ot)}</td>
-                <td style="font-weight:bold;">₪${Math.round(pay.total)}</td>
-                <td><button class="del-btn" onclick="deleteItem('${date}')">✕</button></td>
-            </tr>`;
+                if (isSat) {
+                    normalPay = Math.min(8, h) * (rate * 1.5);
+                    otPay = Math.max(0, h - 8) * (rate * 1.75);
+                } else {
+                    normalPay = Math.min(8, h) * rate;
+                    otPay = (Math.max(0, Math.min(2, h - 8)) * rate * 1.25) + (Math.max(0, h - 10) * rate * 1.5);
+                }
+
+                sumH += h;
+                totalGross += (normalPay + otPay);
+                tbody.innerHTML += `<tr><td>${date.split('-')[2]}/${date.split('-')[1]} ${isSat?'<br><span style="color:red;font-size:0.6rem;">SAT</span>':''}</td><td style="font-weight:700;">${h.toFixed(2)}</td><td>${Math.round(normalPay)}</td><td style="color:#6f42c1;font-weight:bold;">${Math.round(otPay)}</td><td style="font-weight:800;">₪${Math.round(normalPay + otPay)}</td><td><button onclick="deleteItem('${date}')" style="color:#ccc;border:none;background:none;font-size:1.2rem;">✕</button></td></tr>`;
+            }
         });
 
-        document.getElementById('totalH').innerText = sumH.toFixed(2);
-        document.getElementById('totalNormalP').innerText = Math.round(sumNormalP).toLocaleString();
-        document.getElementById('totalOTP').innerText = Math.round(sumOTP).toLocaleString();
-        document.getElementById('totalP').innerText = Math.round(sumNormalP + sumOTP).toLocaleString();
-        localStorage.setItem('work_data_v3', JSON.stringify(workData));
+        document.getElementById('totalHDisplay').innerText = sumH.toFixed(2) + " ชม.";
+        document.getElementById('grossDisplay').innerText = "₪" + Math.round(totalGross + bonus).toLocaleString();
+        document.getElementById('netDisplay').innerText = Math.round(totalGross + bonus - deduct).toLocaleString();
+        localStorage.setItem('work_data_v2', JSON.stringify(workData));
     }
 
     function saveManual() {
         const d = document.getElementById('manualDate').value;
-        const tIn = document.getElementById('timeIn').value;
-        const tOut = document.getElementById('timeOut').value;
-        const b = parseFloat(document.getElementById('manualBreak').value) || 0;
-
-        if(!d || !tIn || !tOut) return alert("กรุณากรอกข้อมูลให้ครบ");
-
-        const s = new Date(d.replace(/-/g, '/') + ' ' + tIn);
-        let e = new Date(d.replace(/-/g, '/') + ' ' + tOut);
-        if (e <= s) e.setDate(e.getDate() + 1);
-
-        const diff = (e - s) / 3600000 - b;
-        if(diff <= 0) return alert("ตรวจสอบเวลาอีกครั้ง");
-
-        workData[d] = (parseFloat(workData[d] || 0) + diff).toFixed(2);
-        renderData();
-        alert("บันทึกสำเร็จ!");
-    }
-
-    function deleteItem(d) {
-        if(confirm('ลบรายการวันที่ ' + d + '?')) {
-            delete workData[d];
-            renderData();
-        }
+        const start = new Date(d.replace(/-/g, '/') + ' ' + document.getElementById('timeIn').value);
+        let end = new Date(d.replace(/-/g, '/') + ' ' + document.getElementById('timeOut').value);
+        if (end <= start) end.setDate(end.getDate() + 1);
+        const diff = (end - start) / 3600000 - parseFloat(document.getElementById('manualBreak').value);
+        if(diff > 0) { workData[d] = (parseFloat(workData[d] || 0) + diff).toFixed(2); renderData(); alert("บันทึกแล้ว"); }
     }
 
     function startWork() {
         startTime = new Date();
         document.getElementById('startBtn').style.display = 'none';
         document.getElementById('endBtn').style.display = 'block';
-        document.getElementById('statusLabel').innerText = "กำลังทำงาน (เริ่ม: " + startTime.toLocaleTimeString() + ")";
-        timerInterval = setInterval(updateTimer, 1000);
-    }
-
-    function updateTimer() {
-        const now = new Date();
-        const diff = now - startTime;
-        const h = Math.floor(diff / 3600000);
-        const m = Math.floor((diff % 3600000) / 60000);
-        const s = Math.floor((diff % 60000) / 1000);
-        document.getElementById('timerDisplay').innerText = 
-            `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+        timerInterval = setInterval(() => {
+            const diff = new Date() - startTime;
+            const h = Math.floor(diff/3600000).toString().padStart(2,'0');
+            const m = Math.floor((diff%3600000)/60000).toString().padStart(2,'0');
+            const s = Math.floor((diff%60000)/1000).toString().padStart(2,'0');
+            document.getElementById('timerDisplay').innerText = `${h}:${m}:${s}`;
+        }, 1000);
     }
 
     function endWork() {
-        if(!confirm("ต้องการบันทึกเวลาเลิกงาน?")) return;
+        if(!confirm("บันทึกเวลาเลิกงาน? (หักพัก 30 นาที)")) return;
         const diff = (new Date() - startTime) / 3600000;
-        const d = document.getElementById('currentDate').value;
-        // ลอจิกหักพักอัตโนมัติ 0.5 ชม. ถ้าทำเกิน 6 ชม. (ตัวอย่าง)
-        let finalDiff = diff > 6 ? diff - 0.5 : diff;
-        
-        workData[d] = (parseFloat(workData[d] || 0) + finalDiff).toFixed(2);
+        let finalDiff = diff > 0.5 ? diff - 0.5 : diff;
+        workData[document.getElementById('currentDate').value] = (parseFloat(workData[document.getElementById('currentDate').value] || 0) + finalDiff).toFixed(2);
         clearInterval(timerInterval);
-        renderData();
         location.reload();
     }
 
-    function clearSystem() {
-        if(confirm("ล้างข้อมูลทั้งหมด? ข้อมูลจะหายถาวร!")) {
-            localStorage.clear();
-            location.reload();
-        }
-    }
-
+    function deleteItem(d) { if(confirm('ลบ?')) { delete workData[d]; renderData(); } }
+    function clearSystem() { if(confirm('ล้างทั้งหมด?')) { localStorage.clear(); location.reload(); } }
     renderData();
 </script>
 </body>
