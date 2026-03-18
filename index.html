@@ -3,155 +3,205 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Work Pro Israel - Pro V6</title>
+    <title>Work Pro V13 - Fully Loaded</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root { --bg: #f0f2f5; --card-bg: #ffffff; --primary: #4e73df; --success: #1cc88a; --danger: #e74a3b; --text-main: #2e3440; --text-sub: #858796; --night: #6f42c1; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg); color: var(--text-main); margin: 0; padding: 20px 15px; }
+        :root { 
+            --neon-blue: #00d2ff; --neon-pink: #ff007f; --neon-green: #00ff88;
+            --neon-purple: #9d50bb; --gold: #ffcc00; --bg-black: #0a0b10; --glass: rgba(255, 255, 255, 0.08);
+        }
+        body { 
+            font-family: 'Segoe UI', sans-serif; background-color: var(--bg-black);
+            background-image: linear-gradient(135deg, #0f172a 0%, #020617 100%);
+            color: #fff; margin: 0; padding: 15px; min-height: 100vh;
+        }
         .container { max-width: 480px; margin: 0 auto; }
-        .card { background: var(--card-bg); border-radius: 18px; padding: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.04); margin-bottom: 15px; border: 1px solid rgba(0,0,0,0.02); }
-        .card-title { font-size: 0.75rem; font-weight: 800; color: var(--text-sub); text-transform: uppercase; margin-bottom: 12px; display: block; letter-spacing: 0.5px; }
-        input, select { background: #f8f9fc; border: 1px solid #d1d3e2; padding: 12px; border-radius: 10px; width: 100%; box-sizing: border-box; font-size: 1rem; margin-bottom: 10px; outline: none; }
-        .timer-display { font-size: 3.2rem; font-weight: 800; text-align: center; margin: 15px 0; color: var(--primary); font-family: monospace; }
-        .btn { padding: 16px; border: none; border-radius: 12px; font-weight: 700; width: 100%; cursor: pointer; margin-bottom: 10px; transition: 0.2s; }
-        .btn-success { background: var(--success); color: white; }
-        .btn-danger { background: var(--danger); color: white; }
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-outline { background: none; border: 1px solid var(--text-sub); color: var(--text-sub); padding: 10px; font-size: 0.75rem; border-radius: 10px; }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; font-size: 0.65rem; color: var(--text-sub); padding: 10px; border-bottom: 1px solid #eaecf4; }
-        td { padding: 12px 10px; font-size: 0.85rem; border-bottom: 1px solid #f8f9fc; }
-        .summary-card { background: linear-gradient(135deg, #1a1c23, #2d3436); color: white; padding: 25px; border-radius: 22px; text-align: center; margin-top: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        .net-amount { font-size: 3rem; font-weight: 800; color: #00ff88; display: block; margin: 5px 0; }
-        .badge { font-size: 0.55rem; font-weight: bold; padding: 2px 5px; border-radius: 4px; margin-top: 3px; display: inline-block; }
-        .badge-fri { background: #e3f2fd; color: #1976d2; }
-        .badge-sat { background: #ffebee; color: #d32f2f; }
-        .badge-night { background: #f3e5f5; color: var(--night); }
+        .glass-card {
+            background: var(--glass); backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 28px;
+            padding: 20px; margin-bottom: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+        }
+        .card-title { font-size: 0.7rem; font-weight: 900; color: var(--neon-blue); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; display: block; }
+        
+        /* Predictor */
+        .predict-box {
+            background: linear-gradient(135deg, rgba(157, 80, 187, 0.2), rgba(110, 72, 170, 0.1));
+            border: 1px solid var(--neon-purple); border-radius: 22px; padding: 15px; text-align: center; margin-bottom: 15px;
+        }
+        .predict-val { font-size: 1.8rem; font-weight: 900; color: var(--neon-purple); text-shadow: 0 0 10px rgba(157, 80, 187, 0.5); }
+
+        .timer-display { font-size: 3.5rem; font-weight: 900; text-align: center; margin: 10px 0; color: #fff; text-shadow: 0 0 20px var(--neon-blue); font-family: monospace; }
+        
+        .btn { padding: 18px; border: none; border-radius: 18px; font-weight: 900; width: 100%; cursor: pointer; transition: 0.3s; font-size: 1.1rem; text-transform: uppercase; }
+        .btn-start { background: linear-gradient(45deg, #00d2ff, #3a7bd5); color: #fff; }
+        .btn-end { background: linear-gradient(45deg, #f80759, #bc4e9c); color: #fff; }
+        .btn-manual { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 12px; margin-top: 10px; font-size: 0.8rem; }
+
+        .summary-box {
+            background: linear-gradient(180deg, rgba(0,255,136,0.1) 0%, rgba(0,0,0,0.4) 100%);
+            border: 2px solid var(--neon-green); border-radius: 35px; padding: 25px 20px; text-align: center;
+        }
+        .net-amount { font-size: 3.2rem; font-weight: 900; color: var(--neon-green); text-shadow: 0 0 15px rgba(0,255,136,0.4); display: block; }
+        
+        input, select { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); padding: 12px; border-radius: 15px; color: #fff; outline: none; width: 100%; box-sizing: border-box; }
+        .deduct-input { border: 1px dashed var(--neon-pink); color: #ff8a80; font-weight: bold; text-align: center; margin-top: 10px; }
+        
+        .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .setting-item label { font-size: 0.6rem; color: #aaa; margin-left: 5px; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.8rem; }
+        td { padding: 12px 5px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .badge-ot { background: rgba(255, 204, 0, 0.2); color: var(--gold); padding: 2px 5px; border-radius: 4px; font-size: 0.65rem; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="card" style="border-left: 5px solid var(--primary);">
-        <span class="card-title">📅 เรียกดูรายเดือน</span>
-        <input type="month" id="monthFilter" onchange="renderData()">
+    <div class="glass-card">
+        <span class="card-title">📈 PERFORMANCE</span>
+        <div style="height: 150px;"><canvas id="workChart"></canvas></div>
     </div>
 
-    <div class="card">
-        <span class="card-title">🕒 บันทึกเวลาทำงานปัจจุบัน</span>
-        <input type="date" id="currentDate">
+    <div class="predict-box">
+        <span class="card-title" style="color:var(--neon-purple); margin-bottom:5px;">🔮 PREDICTION</span>
+        <div class="predict-val">฿ <span id="predictTHB">0</span></div>
+        <div style="font-size:0.6rem; opacity:0.8;">(คาดการณ์เงินออกสิ้นเดือน)</div>
+    </div>
+
+    <div class="settings-grid">
+        <div class="setting-item">
+            <label>ILS RATE (₪/ชม.)</label>
+            <input type="number" id="rate" value="38" oninput="renderData()">
+        </div>
+        <div class="setting-item">
+            <label>THB RATE (฿/₪)</label>
+            <input type="number" id="thbRate" value="9.8" oninput="renderData()">
+        </div>
+    </div>
+
+    <div class="glass-card" style="text-align:center;">
+        <span class="card-title">🕒 TIME TRACKER</span>
         <div class="timer-display" id="timerDisplay">00:00:00</div>
-        <div id="timerControls">
+        <div style="display:grid; grid-template-columns: 1.5fr 1fr; gap:10px; margin-bottom:12px;">
+            <input type="month" id="monthFilter" onchange="renderData()">
             <select id="currentShift">
-                <option value="day">☀️ กะกลางวัน (OT เริ่มชม. 9)</option>
-                <option value="night">🌙 กะกลางคืน (OT เริ่มชม. 8)</option>
+                <option value="day">Day Shift</option>
+                <option value="night">Night Shift</option>
             </select>
-            <button id="startBtn" class="btn btn-success" onclick="startWork()">เริ่มทำงาน</button>
-            <button id="endBtn" class="btn btn-danger" style="display:none;" onclick="endWork()">เลิกงาน</button>
         </div>
-        <p id="statusLabel" style="text-align:center; font-size:0.75rem; color:var(--text-sub); margin:0;">สถานะ: พร้อมบันทึก</p>
+        <button id="startBtn" class="btn btn-start" onclick="startWork()">START MISSION</button>
+        <button id="endBtn" class="btn btn-end" style="display:none;" onclick="endWork()">COMPLETE MISSION</button>
+        
+        <button class="btn btn-manual" onclick="manualSave()">➕ บันทึกย้อนหลัง (Manual Save)</button>
     </div>
 
-    <div class="card" style="border: 1px dashed #ccc; background: #fafafa;">
-        <span class="card-title">📝 บันทึกย้อนหลัง</span>
-        <input type="date" id="manualDate">
-        <div class="grid-2">
-            <div><label style="font-size:0.6rem">เริ่ม</label><input type="time" id="timeIn" value="06:00"></div>
-            <div><label style="font-size:0.6rem">เลิก</label><input type="time" id="timeOut" value="17:00"></div>
-        </div>
-        <div class="grid-2">
-            <select id="manualShift">
-                <option value="day">☀️ กะกลางวัน</option>
-                <option value="night">🌙 กะกลางคืน</option>
-            </select>
-            <input type="number" id="manualBreak" value="0.5" step="0.1" placeholder="พัก (ชม.)">
-        </div>
-        <button class="btn btn-primary" onclick="saveManual()">บันทึกข้อมูลย้อนหลัง</button>
-    </div>
-
-    <div class="card">
-        <span class="card-title">⚙️ ตั้งค่าเงินเดือน</span>
-        <div class="grid-2">
-            <div><label style="font-size:0.6rem">ค่าแรง/ชม.</label><input type="number" id="rate" value="38" oninput="renderData()"></div>
-            <div><label style="font-size:0.6rem">รายได้เสริม</label><input type="number" id="bonus" value="0" oninput="renderData()"></div>
-        </div>
-        <label style="font-size:0.6rem">ยอดหักรวม (กรอกเองตามสลิป)</label>
-        <input type="number" id="totalDeduction" value="0" oninput="renderData()">
-    </div>
-
-    <div class="card" style="padding: 10px; overflow-x: auto;">
-        <table>
-            <thead><tr><th>วันที่</th><th>ชม.</th><th>ปกติ</th><th>โอที</th><th>รวม</th><th></th></tr></thead>
-            <tbody id="tableBody"></tbody>
-        </table>
-    </div>
-
-    <div class="summary-card">
-        <span style="opacity: 0.8; font-size: 0.9rem;">รายรับสุทธิ (Net Pay)</span>
+    <div class="summary-box">
         <span class="net-amount">₪ <span id="netDisplay">0</span></span>
-        <div style="display: flex; justify-content: space-around; font-size: 0.8rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; margin-bottom: 10px;">
-            <div>ชั่วโมงรวม: <b id="totalHDisplay">0</b></div>
-            <div>ยอดก่อนหัก: <b id="grossDisplay">0</b></div>
-        </div>
-        <button onclick="copySummary()" style="background:rgba(255,255,255,0.15); border:none; color:white; padding:10px; border-radius:10px; font-size:0.8rem; cursor:pointer; width:100%;">📋 ก๊อปปี้สรุปยอดส่ง LINE</button>
+        <span style="font-size:1.6rem; color:var(--gold); font-weight:800;">≈ ฿ <span id="thbDisplay">0</span></span>
+        <input type="number" id="manualDeduct" class="deduct-input" placeholder="ยอดหักจากสลิป (₪)" oninput="renderData()">
+        <button onclick="copySummary()" style="background:var(--neon-green); border:none; color:#000; padding:12px; border-radius:15px; font-weight:900; width:100%; margin-top:15px;">📤 EXPORT TO LINE</button>
     </div>
 
-    <div class="grid-2" style="margin-top: 15px;">
-        <button onclick="backupData()" class="btn-outline">📥 สำรองลง Note</button>
-        <button onclick="restoreData()" class="btn-outline">📤 กู้คืนข้อมูล</button>
+    <div class="glass-card" style="margin-top:15px; padding:10px; max-height:200px; overflow-y:auto;">
+        <table><tbody id="tableBody"></tbody></table>
     </div>
-    <button onclick="clearSystem()" style="width:100%; background:none; color:#ccc; border:none; padding: 20px; font-size: 0.7rem;">ล้างข้อมูลทั้งหมด</button>
 </div>
 
 <script>
-    let workData = JSON.parse(localStorage.getItem('work_data_v3') || "{}");
-    let timerInterval;
+    let myChart = null;
+    const quotes = [
+        "วันนี้คุณเก่งมาก! พักผ่อนให้เต็มที่นะ 😴",
+        "ยอดเยี่ยม! อีกวันหนึ่งที่ขยับเข้าใกล้ฝันแล้ว 🚀",
+        "ความเหนื่อยในวันนี้ คือทุนของความสบายในวันหน้า 💰",
+        "เลิกงานแล้ว! ไปหาอะไรอร่อยๆ ทานนะ 🍜",
+        "วันนี้คุณคือผู้ชนะ! พักผ่อนได้! 🏁"
+    ];
+
+    function getWorkData() { return JSON.parse(localStorage.getItem('work_data_v3') || "{}"); }
 
     function renderData() {
+        const workData = getWorkData();
         const tbody = document.getElementById('tableBody');
-        const rate = parseFloat(document.getElementById('rate').value) || 0;
-        const bonus = parseFloat(document.getElementById('bonus').value) || 0;
-        const deduct = parseFloat(document.getElementById('totalDeduction').value) || 0;
-        const month = document.getElementById('monthFilter').value;
-        let sumH = 0, totalPay = 0;
+        const rate = parseFloat(document.getElementById('rate').value) || 38;
+        const thbRate = parseFloat(document.getElementById('thbRate').value) || 9.8;
+        const manualDeduct = parseFloat(document.getElementById('manualDeduct').value) || 0;
+        const monthFilter = document.getElementById('monthFilter').value;
+        
+        let sumH = 0, totalPay = 0, daysWorked = 0;
+        let labels = [], values = [];
         tbody.innerHTML = "";
 
-        Object.keys(workData).sort().reverse().forEach(d => {
-            if (d.startsWith(month)) {
+        Object.keys(workData).sort().forEach(d => {
+            if (d.startsWith(monthFilter)) {
                 const entry = workData[d];
-                let h = entry.hours, dayIdx = new Date(d).getDay(), isNight = entry.shift === 'night', np, op;
-                let labels = "";
-
-                if(dayIdx === 6) { // เสาร์
-                    np = Math.min(8, h) * rate * 1.5; op = Math.max(0, h-8) * rate * 1.75;
-                    labels += '<br><span class="badge badge-sat">SAT</span>';
-                } else {
-                    let limit = isNight ? 7 : 8; // กะคืนปกติ 7 ชม.
-                    np = Math.min(limit, h) * rate;
-                    op = (Math.max(0, Math.min(2, h-limit)) * rate * 1.25) + (Math.max(0, h-(limit+2)) * rate * 1.5);
-                    if(dayIdx === 5) labels += '<br><span class="badge badge-fri">FRI</span>';
-                    if(isNight) labels += '<br><span class="badge badge-night">NIGHT</span>';
-                }
-                sumH += h; totalPay += (np + op);
-                tbody.innerHTML += `<tr><td>${d.split('-')[2]}/${d.split('-')[1]}${labels}</td><td style="font-weight:700">${h.toFixed(2)}</td><td>${Math.round(np)}</td><td>${Math.round(op)}</td><td style="font-weight:bold">₪${Math.round(np+op)}</td><td onclick="del('${d}')" style="color:#ccc">✕</td></tr>`;
+                let h = parseFloat(entry.hours) || 0;
+                let dayIdx = new Date(d).getDay();
+                let np = (dayIdx === 6) ? Math.min(8, h) * rate * 1.5 : Math.min(8, h) * rate;
+                let op = (dayIdx === 6) ? Math.max(0, h-8) * rate * 1.75 : (Math.max(0, Math.min(2, h-8)) * rate * 1.25) + (Math.max(0, h-10) * rate * 1.5);
+                let dayTotal = Math.round(np + op);
+                sumH += h; totalPay += dayTotal; daysWorked++;
+                labels.push(d.split('-')[2]); values.push(dayTotal);
+                tbody.innerHTML = `<tr><td>${d.split('-')[2]}</td><td>${h}h ${h>9?'<span class="badge-ot">OT</span>':''}</td><td style="color:var(--neon-green); text-align:right;">₪${dayTotal}</td><td onclick="del('${d}')" style="opacity:0.2; text-align:right;">✕</td></tr>` + tbody.innerHTML;
             }
         });
-        document.getElementById('totalHDisplay').innerText = sumH.toFixed(2);
-        document.getElementById('grossDisplay').innerText = "₪"+Math.round(totalPay+bonus).toLocaleString();
-        document.getElementById('netDisplay').innerText = Math.round(totalPay+bonus-deduct).toLocaleString();
+
+        const net = Math.round(totalPay) - manualDeduct;
+        document.getElementById('netDisplay').innerText = net.toLocaleString();
+        document.getElementById('thbDisplay').innerText = Math.round(net * thbRate).toLocaleString();
+
+        if(daysWorked > 0) {
+            const lastDay = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
+            const predictedNet = (net / daysWorked) * lastDay;
+            document.getElementById('predictTHB').innerText = Math.round(predictedNet * thbRate).toLocaleString();
+        }
+        updateChart(labels, values);
+        localStorage.setItem('config_rate', rate);
+        localStorage.setItem('config_thb', thbRate);
+    }
+
+    function manualSave() {
+        const d = prompt("ใส่วันที่ (เช่น 2026-03-18):", new Date().toISOString().split('T')[0]);
+        if(!d) return;
+        const h = prompt("ใส่จำนวนชั่วโมง (เช่น 11):");
+        if(!h) return;
+        let workData = getWorkData();
+        workData[d] = { hours: parseFloat(h), shift: 'day' };
         localStorage.setItem('work_data_v3', JSON.stringify(workData));
+        renderData();
+    }
+
+    function startWork() { localStorage.setItem('running_start_time', Date.now()); window.location.reload(); }
+
+    function endWork() {
+        const start = localStorage.getItem('running_start_time');
+        const diff = (Date.now() - parseInt(start)) / 3600000;
+        let finalH = diff > 5 ? (diff - 0.5).toFixed(2) : diff.toFixed(2);
+        const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+        if(!confirm(`💰 ${finalH} ชม.\n\n"${randomQuote}"`)) return;
+        let workData = getWorkData();
+        workData[new Date().toISOString().split('T')[0]] = { hours: parseFloat(finalH) };
+        localStorage.setItem('work_data_v3', JSON.stringify(workData));
+        localStorage.removeItem('running_start_time');
+        window.location.reload();
+    }
+
+    function updateChart(l, v) {
+        const ctx = document.getElementById('workChart').getContext('2d');
+        if (myChart) myChart.destroy();
+        myChart = new Chart(ctx, {
+            type: 'line',
+            data: { labels: l, datasets: [{ data: v, borderColor: '#00d2ff', backgroundColor: 'rgba(0, 210, 255, 0.1)', fill: true, tension: 0.4, borderWidth: 3, pointRadius: 0 }] },
+            options: { responsive: true, maintainAspectRatio: false, scales: { y: { display: false }, x: { grid: { display: false }, ticks: { color: '#555', font: { size: 9 } } } }, plugins: { legend: { display: false } } }
+        });
     }
 
     function checkRunningTimer() {
         const saved = localStorage.getItem('running_start_time');
         if (saved) {
-            const start = new Date(parseInt(saved));
             document.getElementById('startBtn').style.display = 'none';
             document.getElementById('endBtn').style.display = 'block';
-            document.getElementById('currentShift').style.display = 'none';
-            document.getElementById('statusLabel').innerText = "กำลังบันทึกเวลา... (ปิดแอปได้)";
-            timerInterval = setInterval(() => {
-                const diff = new Date() - start;
+            setInterval(() => {
+                const diff = new Date() - new Date(parseInt(saved));
                 const h = Math.floor(diff/3600000).toString().padStart(2,'0');
                 const m = Math.floor((diff%3600000)/60000).toString().padStart(2,'0');
                 const s = Math.floor((diff%60000)/1000).toString().padStart(2,'0');
@@ -160,60 +210,15 @@
         }
     }
 
-    function startWork() {
-        localStorage.setItem('running_start_time', Date.now());
-        localStorage.setItem('running_shift', document.getElementById('currentShift').value);
-        location.reload();
-    }
-
-    function endWork() {
-        const d = document.getElementById('currentDate').value;
-        const dayIdx = new Date(d).getDay();
-        const start = localStorage.getItem('running_start_time');
-        const shift = localStorage.getItem('running_shift');
-        const diff = (Date.now() - parseInt(start)) / 3600000;
-        
-        let finalH = (dayIdx !== 5 && diff > 0.5) ? diff - 0.5 : diff;
-        let msg = dayIdx === 5 ? "วันนี้วันศุกร์ บันทึกเต็มไม่หักพัก" : "บันทึกเวลา (หักพัก 30 นาทีอัตโนมัติ)";
-        
-        if(!confirm(msg)) return;
-        workData[d] = { hours: parseFloat(finalH.toFixed(2)), shift: shift };
-        localStorage.removeItem('running_start_time');
-        localStorage.removeItem('running_shift');
-        location.reload();
-    }
-
-    function saveManual() {
-        const d = document.getElementById('manualDate').value;
-        const s = new Date(d.replace(/-/g, '/') + ' ' + document.getElementById('timeIn').value);
-        let e = new Date(d.replace(/-/g, '/') + ' ' + document.getElementById('timeOut').value);
-        if (e <= s) e.setDate(e.getDate() + 1);
-        const diff = (e - s) / 3600000 - parseFloat(document.getElementById('manualBreak').value);
-        workData[d] = { hours: parseFloat(diff.toFixed(2)), shift: document.getElementById('manualShift').value };
-        renderData(); alert("บันทึกย้อนหลังสำเร็จ");
-    }
-
-    function backupData() {
-        navigator.clipboard.writeText(JSON.stringify(workData)).then(() => alert("คัดลอกรหัสข้อมูลแล้ว! นำไปวางในแอป Note เก็บไว้ได้เลย"));
-    }
-
-    function restoreData() {
-        const data = prompt("วางรหัสข้อมูลเพื่อกู้คืน:");
-        if (data) { try { workData = JSON.parse(data); renderData(); alert("กู้คืนสำเร็จ!"); } catch(e) { alert("รหัสไม่ถูกต้อง"); } }
-    }
-
+    function del(d) { if(confirm('ลบ?')) { let wd = getWorkData(); delete wd[d]; localStorage.setItem('work_data_v3', JSON.stringify(wd)); renderData(); } }
     function copySummary() {
-        const msg = `📊 สรุปงานเดือน ${document.getElementById('monthFilter').value}\n⏱️ ชม.รวม: ${document.getElementById('totalHDisplay').innerText} ชม.\n💰 สุทธิ: ₪${document.getElementById('netDisplay').innerText}\n(บันทึกผ่าน Work Pro)`;
-        navigator.clipboard.writeText(msg).then(() => alert("ก๊อปปี้สรุปยอดแล้ว!"));
+        const msg = `📊 REPORT\n₪ สุทธิ: ${document.getElementById('netDisplay').innerText}\n฿ ไทย: ${document.getElementById('thbDisplay').innerText}\n🔮 คาดการณ์: ฿${document.getElementById('predictTHB').innerText}`;
+        navigator.clipboard.writeText(msg).then(() => alert("คัดลอกแล้ว!"));
     }
 
-    function del(d) { if(confirm('ลบรายการนี้?')) { delete workData[d]; renderData(); } }
-    function clearSystem() { if(confirm('ล้างทั้งหมด?')) { localStorage.clear(); location.reload(); } }
-
-    const today = new Date();
-    document.getElementById('monthFilter').value = today.toISOString().substring(0, 7);
-    document.getElementById('currentDate').value = today.toISOString().split('T')[0];
-    document.getElementById('manualDate').value = today.toISOString().split('T')[0];
+    document.getElementById('rate').value = localStorage.getItem('config_rate') || 38;
+    document.getElementById('thbRate').value = localStorage.getItem('config_thb') || 9.8;
+    document.getElementById('monthFilter').value = new Date().toISOString().substring(0, 7);
     checkRunningTimer();
     renderData();
 </script>
