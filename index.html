@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Work Pro - Share Edition</title>
+    <title>Work Pro - Reset Edition</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { --neon-blue: #00d2ff; --neon-pink: #ff007f; --neon-green: #00ff88; --neon-purple: #9d50bb; --gold: #ffcc00; --bg-black: #0a0b10; --glass: rgba(255, 255, 255, 0.08); }
@@ -26,6 +26,7 @@
         td { padding: 12px 5px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .backup-section { margin-top: 25px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; opacity: 0.8; }
         .btn-backup { padding: 10px; border-radius: 12px; font-size: 0.65rem; font-weight: bold; cursor: pointer; border: 1px solid #444; background: #111; color: #fff; }
+        .btn-reset { grid-column: span 2; background: rgba(248, 7, 89, 0.1); border: 1px solid #f80759; color: #f80759; margin-top: 10px; padding: 10px; border-radius: 12px; font-size: 0.7rem; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -51,7 +52,6 @@
         <span class="net-amount">₪ <span id="netDisplay">0</span></span>
         <span style="font-size:1.6rem; color:var(--gold); font-weight:800;">≈ ฿ <span id="thbDisplay">0</span></span>
         <input type="number" id="manualDeduct" style="border:1px dashed #ff007f; text-align:center; margin-top:10px; background:none; color:#ff8a80;" placeholder="หักภาษี/ค่าบ้าน (₪)" oninput="renderData()">
-        <button onclick="copySummary()" style="background:var(--neon-green); border:none; color:#000; padding:12px; border-radius:15px; font-weight:900; width:100%; margin-top:15px;">📤 EXPORT TO LINE</button>
     </div>
     <div class="glass-card" style="margin-top:15px; padding:10px; max-height:180px; overflow-y:auto;">
         <table><tbody id="tableBody"></tbody></table>
@@ -60,6 +60,7 @@
         <button class="btn-backup" style="grid-column: span 2; border-color: var(--neon-blue);" onclick="importFromChat()">📥 วางข้อมูลที่ก๊อปจากแชท</button>
         <button class="btn-backup" onclick="exportData()">💾 Backup File</button>
         <button class="btn-backup" onclick="importData()">🔄 Restore File</button>
+        <button class="btn-reset" onclick="resetAll()">🧹 ล้างข้อมูลทั้งหมด (Reset)</button>
     </div>
 </div>
 <script>
@@ -102,13 +103,20 @@
         if (myChart) myChart.destroy();
         myChart = new Chart(ctx, { type: 'bar', data: { labels: l, datasets: [{ data: v, backgroundColor: c, borderRadius: 8, barThickness: 12 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { display: false }, x: { grid: { display: false }, ticks: { color: '#888', font: { size: 9 } } } }, plugins: { legend: { display: false } } } });
     }
+    function resetAll() {
+        if(confirm("🚨 คุณแน่ใจนะ? ข้อมูลทั้งหมดจะหายไปและเริ่มใหม่จาก 0!")) {
+            localStorage.clear();
+            alert("ล้างข้อมูลเรียบร้อยแล้ว!");
+            window.location.reload();
+        }
+    }
     function manualSave() {
         const d = prompt("ใส่วันที่ (เช่น 2026-03-18):", new Date().toISOString().split('T')[0]);
         const h = prompt("ใส่จำนวนชั่วโมง (เช่น 11):");
         if(d && h) { let wd = getWorkData(); wd[d] = { hours: parseFloat(h) }; localStorage.setItem('work_data_v3', JSON.stringify(wd)); renderData(); }
     }
     function importFromChat() { const txt = prompt("วางข้อมูล JSON:"); if(txt) { try { localStorage.setItem('work_data_v3', JSON.stringify(JSON.parse(txt))); window.location.reload(); } catch(e) { alert("พลาด!"); } } }
-    function exportData() { const data = localStorage.getItem('work_data_v3'); const blob = new Blob([data], {type:'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `work_backup.json`; a.click(); }
+    function exportData() { const data = localStorage.getItem('work_data_v3'); if(!data) return alert("ไม่มีข้อมูล!"); const blob = new Blob([data], {type:'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `work_backup.json`; a.click(); }
     function importData() { const input = document.createElement('input'); input.type = 'file'; input.onchange = e => { const reader = new FileReader(); reader.onload = event => { localStorage.setItem('work_data_v3', event.target.result); window.location.reload(); }; reader.readAsText(e.target.files[0]); }; input.click(); }
     function startWork() { localStorage.setItem('running_start_time', Date.now()); window.location.reload(); }
     function endWork() {
@@ -122,7 +130,6 @@
     }
     function checkRunningTimer() { const saved = localStorage.getItem('running_start_time'); if (saved) { document.getElementById('startBtn').style.display = 'none'; document.getElementById('endBtn').style.display = 'block'; setInterval(() => { const diff = new Date() - new Date(parseInt(saved)); const h = Math.floor(diff/3600000).toString().padStart(2,'0'); const m = Math.floor((diff%3600000)/60000).toString().padStart(2,'0'); const s = Math.floor((diff%60000)/1000).toString().padStart(2,'0'); document.getElementById('timerDisplay').innerText = `${h}:${m}:${s}`; }, 1000); } }
     function del(d) { if(confirm('ลบ?')) { let wd = getWorkData(); delete wd[d]; localStorage.setItem('work_data_v3', JSON.stringify(wd)); renderData(); } }
-    function copySummary() { const msg = `📊 REPORT\n₪ สุทธิ: ${document.getElementById('netDisplay').innerText}\n฿ ไทย: ${document.getElementById('thbDisplay').innerText}\n🔮 คาดการณ์: ฿${document.getElementById('predictTHB').innerText}`; navigator.clipboard.writeText(msg).then(() => alert("คัดลอกแล้ว!")); }
     document.getElementById('rate').value = localStorage.getItem('config_rate') || 38;
     document.getElementById('thbRate').value = localStorage.getItem('config_thb') || 9.8;
     document.getElementById('monthFilter').value = new Date().toISOString().substring(0, 7);
