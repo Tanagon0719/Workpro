@@ -3,36 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Work Log Israel V23.7.3 (Monthly Filter)</title>
+    <title>Work Log Israel V23.7.4 (Monthly Color)</title>
     <style>
         :root { 
-            --main-bg: #040608; --card-bg: rgba(15, 22, 20, 0.7); 
-            --neon-blue: #00d2ff; --neon-green: #00ff88; 
-            --matrix-green: #00ff41; --deep-green: #008f11;
-            --night-purple: #9d50bb; --neon-pink: #ff007f;
+            --main-bg: #040608; 
+            --card-bg: rgba(15, 22, 20, 0.7); 
+            /* ค่าสีเริ่มต้น (จะถูกเปลี่ยนอัตโนมัติด้วย JavaScript ตามเดือนที่เลือก) */
+            --neon-color: #00ff88; 
+            --neon-blue: #00d2ff;
+            --neon-pink: #ff007f;
         }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Segoe UI', 'Tahoma', sans-serif; background: var(--main-bg); color: #e0e0e0; margin: 0; padding: 15px; font-size: 14px; }
+        body { font-family: 'Segoe UI', 'Tahoma', sans-serif; background: var(--main-bg); color: #e0e0e0; margin: 0; padding: 15px; font-size: 14px; transition: background 0.5s ease; }
         .container { max-width: 450px; margin: 0 auto; }
         
         .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .month-picker { background: rgba(0, 255, 136, 0.1); border: 1px solid var(--neon-green); color: var(--neon-green); padding: 5px 10px; border-radius: 10px; font-weight: bold; }
+        .month-picker { background: rgba(255, 255, 255, 0.03); border: 1px solid var(--neon-color); color: var(--neon-color); padding: 5px 10px; border-radius: 10px; font-weight: bold; transition: 0.3s; }
 
         .lang-bar { display: flex; gap: 5px; }
         .lang-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #888; padding: 4px 10px; border-radius: 8px; font-size: 0.7rem; cursor: pointer; }
-        .lang-btn.active { border-color: var(--neon-green); color: var(--neon-green); background: rgba(0,255,136,0.1); }
+        .lang-btn.active { border-color: var(--neon-color); color: var(--neon-color); background: rgba(255,255,255,0.02); }
 
-        .main-stat-card { background: linear-gradient(145deg, rgba(0, 255, 136, 0.08), rgba(0, 210, 255, 0.02)); border: 1px solid rgba(0, 255, 136, 0.1); border-radius: 30px; padding: 20px; text-align: center; margin-bottom: 20px; }
-        .net-amount { font-size: 3.5rem; font-weight: 900; color: #fff; display: block; text-shadow: 0 0 20px rgba(0, 255, 136, 0.3); }
-        .total-hours-badge { display: inline-block; background: rgba(0, 210, 255, 0.1); color: var(--neon-blue); padding: 4px 15px; border-radius: 12px; font-weight: bold; margin-top: 10px; font-size: 0.9rem; border: 1px solid rgba(0, 210, 255, 0.2); }
+        .main-stat-card { background: linear-gradient(145deg, rgba(255, 255, 255, 0.03), rgba(0, 0, 0, 0.5)); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 30px; padding: 20px; text-align: center; margin-bottom: 20px; position: relative; box-shadow: 0 0 15px rgba(0,0,0,0.5); }
+        .net-amount { font-size: 3.5rem; font-weight: 900; color: #fff; display: block; text-shadow: 0 0 20px var(--neon-color); }
+        .total-hours-badge { display: inline-block; background: rgba(255, 255, 255, 0.05); color: var(--neon-blue); padding: 4px 15px; border-radius: 12px; font-weight: bold; margin-top: 10px; font-size: 0.9rem; border: 1px solid rgba(255, 255, 255, 0.1); }
         
+        .toggle-eye-btn { position: absolute; top: 15px; right: 20px; background: none; border: none; color: var(--neon-color); font-size: 1.3rem; cursor: pointer; padding: 5px; line-height: 1; }
+
         .glass-panel { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.05); border-radius: 25px; padding: 20px; margin-bottom: 15px; backdrop-filter: blur(15px); }
         .timer-display { font-size: 3.2rem; font-family: monospace; font-weight: bold; text-align: center; margin-bottom: 15px; }
         
         .btn { border: none; border-radius: 20px; font-weight: 800; cursor: pointer; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.2s; }
         .btn-main { height: 60px; font-size: 1.1rem; margin-bottom: 10px; }
         .btn-start { background: #fff; color: #000; }
-        .btn-end { background: linear-gradient(45deg, var(--neon-green), var(--deep-green)); color: #000; }
+        .btn-end { background: var(--neon-color); color: #000; box-shadow: 0 0 15px var(--neon-color); }
         .btn-secondary { background: rgba(255,255,255,0.03); color: #aaa; padding: 12px; font-size: 0.8rem; border: 1px solid rgba(255,255,255,0.05); }
 
         .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
@@ -41,14 +45,14 @@
         .history-item { background: rgba(255,255,255,0.02); border-radius: 18px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05); }
         .hist-info { display: flex; flex-direction: column; gap: 2px; }
         .hist-time-tag { font-size: 0.7rem; color: var(--neon-blue); font-family: monospace; }
-        .hist-pay { text-align: right; font-weight: 800; color: var(--matrix-green); }
+        .hist-pay { text-align: right; font-weight: 800; color: var(--neon-color); }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="header-row">
-        <select id="monthFilter" class="month-picker" onchange="renderData()"></select>
+        <select id="monthFilter" class="month-picker" onchange="applyMonthlyTheme(); renderData();"></select>
         
         <div class="lang-bar">
             <button class="lang-btn active" id="btn-th" onclick="setLang('th')">TH</button>
@@ -58,9 +62,11 @@
     </div>
 
     <div class="main-stat-card">
+        <button id="toggleVisibilityBtn" class="toggle-eye-btn" onclick="toggleIncomeVisibility()">👁️</button>
+        
         <span id="txt-net-label">เงินคงเหลือสุทธิ</span>
         <span class="net-amount" id="netDisplay">0</span>
-        <div style="font-size: 1.2rem; color: var(--matrix-green); margin-bottom: 5px;">≈ ฿<span id="thbDisplay">0</span></div>
+        <div style="font-size: 1.2rem; color: var(--neon-color); margin-bottom: 5px; font-weight: bold;">≈ ฿<span id="thbDisplay">0</span></div>
         <div class="total-hours-badge">
             <span id="txt-total-label">รวม:</span> <span id="totalHoursDisplay">0.00</span> <span id="txt-unit-label">ชม.</span>
         </div>
@@ -96,9 +102,8 @@
     <div id="manualForm" class="glass-panel" style="display:none;">
         <input type="date" id="mDate">
         <div class="input-row"><input type="time" id="mStart" value="06:00"><input type="time" id="mEnd" value="17:00"></div>
-        <div style="margin-top:10px;"><input type="checkbox" id="mNightShift"> <span id="txt-night-check">กะดึก (186%)</span></div>
-        <div class="input-row">
-            <button class="btn btn-secondary" onclick="saveManual()" style="background:var(--neon-green); color:#000;">SAVE</button>
+        <div class="input-row" style="margin-top:15px;">
+            <button class="btn btn-secondary" onclick="saveManual()" style="background:var(--neon-color); color:#000; box-shadow: 0 0 10px var(--neon-color);">SAVE</button>
             <button class="btn btn-secondary" onclick="document.getElementById('manualForm').style.display='none'">CLOSE</button>
         </div>
     </div>
@@ -108,13 +113,37 @@
 
 <script>
     const i18n = {
-        th: { net: "เงินคงเหลือสุทธิ", start: "เริ่มงาน", end: "เลิกงาน", forgot: "ลืมกดเริ่ม", manual: "บันทึกย้อนหลัง", settings: "ตั้งค่า", night: "กะดึก (186%)", in: "เข้า", out: "ออก", total: "รวม:", unit: "ชม." },
-        en: { net: "Net Balance", start: "Check-in", end: "Check-out", forgot: "Forgot Start", manual: "Manual Entry", settings: "Settings", night: "Night Shift", in: "In", out: "Out", total: "Total:", unit: "hrs" },
-        he: { net: "יתרה נטו", start: "כניסה", end: "יציאה", forgot: "שכחתי כניסה", manual: "הזנה ידנית", settings: "הגדרות", night: "משמרת לילה", in: "כניסה", out: "יציאה", total: "סה\"כ:", unit: "שעות" }
+        th: { net: "เงินคงเหลือสุทธิ", start: "เริ่มงาน", end: "เลิกงาน", forgot: "ลืมกดเริ่ม", manual: "บันทึกย้อนหลัง", settings: "ตั้งค่า", in: "เข้า", out: "ออก", total: "รวม:", unit: "ชม." },
+        en: { net: "Net Balance", start: "Check-in", end: "Check-out", forgot: "Forgot Start", manual: "Manual Entry", settings: "Settings", in: "In", out: "Out", total: "Total:", unit: "hrs" },
+        he: { net: "יתרה נטו", start: "כניסה", end: "יציאה", forgot: "שכחתי כניסה", manual: "הזנה ידנית", settings: "הגדרות", in: "כניסה", out: "יציאה", total: "סה\"ค:", unit: "שעות" }
     };
     let currentLang = 'th';
+    let isIncomeHidden = false;
 
-    // สร้างตัวเลือกเดือน
+    // รายชื่อสีนีออนดุดัน 12 เดือน 12 สี (โทน Cyberpunk เข้มขรึม)
+    const monthlyThemes = {
+        "01": "#00ff88", // มกราคม: เขียวนีออนเมทริกซ์
+        "02": "#00ffea", // กุมภาพันธ์: ฟ้าไซเบอร์ไอซ์
+        "03": "#bd00ff", // มีนาคม: ม่วงเทคโนดาร์ก
+        "04": "#ff0055", // เมษายน: แดงเชอร์รี่ดุดัน
+        "05": "#ff5500", // พฤษภาคม: ส้มแมกม่าเดือด
+        "06": "#ffb700", // มิถุนายน: เหลืองอำพันเตือนภัย
+        "07": "#00d2ff", // กรกฎาคม: น้ำเงินอิเล็กทริกบลู
+        "08": "#70ff00", // สิงหาคม: เขียวเลเซอร์ตองอ่อน
+        "09": "#ff00c8", // กันยายน: ชมพูนีออนสว่างวาบ
+        "10": "#ff3c00", // ตุลาคม: ส้มฟักทองฮาโลวีนเข้ม
+        "11": "#00ffa6", // พฤศจิกายน: เขียวหยกดิจิทัล
+        "12": "#9d50bb"  // ธันวาคม: ม่วงพลัมท้ายปี
+    };
+
+    // ฟังก์ชันเปลี่ยนสีแอปพลิเคชันตามเดือนที่ถูกเลือกใน Dropdown
+    function applyMonthlyTheme() {
+        const selectedMonth = document.getElementById('monthFilter').value;
+        const targetColor = monthlyThemes[selectedMonth] || "#00ff88";
+        // เปลี่ยนค่าใน CSS Variable ตัวแปรเดียว คุมสีทั้งแอป
+        document.documentElement.style.setProperty('--neon-color', targetColor);
+    }
+
     const monthNames = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
     const monthFilter = document.getElementById('monthFilter');
     const now = new Date();
@@ -136,13 +165,19 @@
         document.getElementById('txt-forgot-btn').innerText = i18n[lang].forgot;
         document.getElementById('txt-manual-btn').innerText = i18n[lang].manual;
         document.getElementById('txt-settings-btn').innerText = i18n[lang].settings;
-        document.getElementById('txt-night-check').innerText = i18n[lang].night;
         document.getElementById('txt-total-label').innerText = i18n[lang].total;
         document.getElementById('txt-unit-label').innerText = i18n[lang].unit;
         renderData();
     }
 
     const getWorkData = () => JSON.parse(localStorage.getItem('work_data_v3') || "{}");
+
+    function toggleIncomeVisibility() {
+        isIncomeHidden = !isIncomeHidden;
+        const btn = document.getElementById('toggleVisibilityBtn');
+        btn.textContent = isIncomeHidden ? '🙈' : '👁️';
+        renderData();
+    }
 
     function renderData() {
         const workData = getWorkData();
@@ -156,13 +191,15 @@
         listContainer.innerHTML = '';
 
         Object.keys(workData).sort().reverse().forEach(d => {
-            // กรองเฉพาะเดือนที่เลือก (Format: YYYY-MM-DD)
             if (d.split('-')[1] === selectedMonth) {
                 const item = workData[d];
                 const h = item.hours;
                 totalHours += h;
-                let dayPay = item.isNight ? Math.round(h * (rate * 1.86)) : Math.round(h * rate);
+                
+                let dayPay = Math.round(h * rate);
                 totalPay += dayPay;
+                
+                let displayDayPay = isIncomeHidden ? '***' : `₪${dayPay.toLocaleString()}`;
                 
                 listContainer.innerHTML += `
                     <div class="history-item">
@@ -171,14 +208,21 @@
                             <span class="hist-time-tag">
                                 ${i18n[currentLang].in}: ${item.startTime || '--:--'} | ${i18n[currentLang].out}: ${item.endTime || '--:--'}
                             </span>
-                            <span style="font-size:0.7rem; color:#666;">${h} ${i18n[currentLang].unit} ${item.isNight?'🌙':''}</span>
+                            <span style="font-size:0.7rem; color:#666;">${h} ${i18n[currentLang].unit}</span>
                         </div>
-                        <div class="hist-pay">₪${dayPay.toLocaleString()}</div>
+                        <div class="hist-pay">${displayDayPay}</div>
                     </div>`;
             }
         });
-        document.getElementById('netDisplay').innerText = totalPay.toLocaleString();
-        document.getElementById('thbDisplay').innerText = Math.round(totalPay * thbRate).toLocaleString();
+
+        if (isIncomeHidden) {
+            document.getElementById('netDisplay').innerText = '***';
+            document.getElementById('thbDisplay').innerText = '***';
+        } else {
+            document.getElementById('netDisplay').innerText = totalPay.toLocaleString();
+            document.getElementById('thbDisplay').innerText = Math.round(totalPay * thbRate).toLocaleString();
+        }
+        
         document.getElementById('totalHoursDisplay').innerText = totalHours.toFixed(2);
     }
 
@@ -186,28 +230,28 @@
     function exportData() { const data = localStorage.getItem('work_data_v3'); const blob = new Blob([data], {type: 'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `work_backup.json`; a.click(); }
     function importData() { document.getElementById('fileInput').click(); }
     function handleFile(e) { const reader = new FileReader(); reader.onload = (ev) => { localStorage.setItem('work_data_v3', ev.target.result); window.location.reload(); }; reader.readAsText(e.target.files[0]); }
+    
     function startWork() { 
         const now = new Date(); 
-        const isNight = confirm("เริ่มกะดึกใช่หรือไม่? (186%)"); 
         localStorage.setItem('running_start_time', now.getTime()); 
         localStorage.setItem('start_clock', now.getHours().toString().padStart(2,'0') + ":" + now.getMinutes().toString().padStart(2,'0')); 
-        localStorage.setItem('is_night_shift', isNight ? 'true' : 'false'); 
         window.location.reload(); 
     }
+    
     function endWork() { 
         const startTs = localStorage.getItem('running_start_time');
         const startClock = localStorage.getItem('start_clock');
-        const isNight = localStorage.getItem('is_night_shift') === 'true';
         const now = new Date();
         const endClock = now.getHours().toString().padStart(2,'0') + ":" + now.getMinutes().toString().padStart(2,'0');
         const diff = (now.getTime() - parseInt(startTs)) / 3600000;
         let finalH = diff > 5 ? (diff - 0.5).toFixed(2) : diff.toFixed(2);
         let wd = getWorkData();
-        wd[now.toISOString().split('T')[0]] = { hours: parseFloat(finalH), startTime: startClock, endTime: endClock, isNight: isNight };
+        wd[now.toISOString().split('T')[0]] = { hours: parseFloat(finalH), startTime: startClock, endTime: endClock };
         localStorage.setItem('work_data_v3', JSON.stringify(wd));
         localStorage.removeItem('running_start_time');
         window.location.reload();
     }
+    
     function forgotToStart() {
         const time = prompt("เวลาเริ่มงานจริง (HH:MM)", "06:00");
         if(time) {
@@ -216,15 +260,14 @@
             const startStr = new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m);
             localStorage.setItem('running_start_time', startStr.getTime());
             localStorage.setItem('start_clock', time);
-            localStorage.setItem('is_night_shift', confirm("กะดึกใช่ไหม?") ? 'true' : 'false');
             window.location.reload();
         }
     }
+    
     function saveManual() {
         const d = document.getElementById('mDate').value;
         const s = document.getElementById('mStart').value;
         const e = document.getElementById('mEnd').value;
-        const isN = document.getElementById('mNightShift').checked;
         if(!d || !s || !e) return;
         let sDec = parseInt(s.split(':')[0]) + (parseInt(s.split(':')[1])/60);
         let eDec = parseInt(e.split(':')[0]) + (parseInt(e.split(':')[1])/60);
@@ -232,13 +275,15 @@
         let diff = eDec - sDec;
         let finalH = diff > 5 ? (diff - 0.5).toFixed(2) : diff.toFixed(2);
         let wd = getWorkData();
-        wd[d] = { hours: parseFloat(finalH), startTime: s, endTime: e, isNight: isN };
+        wd[d] = { hours: parseFloat(finalH), startTime: s, endTime: e };
         localStorage.setItem('work_data_v3', JSON.stringify(wd));
         document.getElementById('manualForm').style.display='none';
         renderData();
     }
+    
     function manualInput() { document.getElementById('manualForm').style.display='block'; document.getElementById('mDate').value = new Date().toISOString().split('T')[0]; }
     function resetAll() { if(confirm('ล้างข้อมูลทั้งหมด?')) { localStorage.clear(); window.location.reload(); } }
+    
     function checkRunningTimer() {
         const saved = localStorage.getItem('running_start_time');
         if (saved) {
@@ -253,7 +298,11 @@
             }, 1000);
         }
     }
-    checkRunningTimer(); renderData();
+    
+    // เริ่มต้นระบบ: รันธีมสีก่อนเรนเดอร์ข้อมูล
+    applyMonthlyTheme();
+    checkRunningTimer(); 
+    renderData();
 </script>
 </body>
 </html>
