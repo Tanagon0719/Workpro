@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Work Log Israel V23.7.4 (Monthly Color)</title>
+    <title>Work Log Israel V23.7.5 (Fix Past Times)</title>
     <style>
         :root { 
             --main-bg: #040608; 
             --card-bg: rgba(15, 22, 20, 0.7); 
-            /* ค่าสีเริ่มต้น (จะถูกเปลี่ยนอัตโนมัติด้วย JavaScript ตามเดือนที่เลือก) */
             --neon-color: #00ff88; 
             --neon-blue: #00d2ff;
             --neon-pink: #ff007f;
@@ -57,7 +56,7 @@
         <div class="lang-bar">
             <button class="lang-btn active" id="btn-th" onclick="setLang('th')">TH</button>
             <button class="lang-btn" id="btn-en" onclick="setLang('en')">EN</button>
-            <button class="lang-btn" id="btn-he" onclick="setLang('he')">עב</button>
+            <button class="lang-btn" id="btn-he" onclick="setLang('he')">עบ</button>
         </div>
     </div>
 
@@ -115,32 +114,20 @@
     const i18n = {
         th: { net: "เงินคงเหลือสุทธิ", start: "เริ่มงาน", end: "เลิกงาน", forgot: "ลืมกดเริ่ม", manual: "บันทึกย้อนหลัง", settings: "ตั้งค่า", in: "เข้า", out: "ออก", total: "รวม:", unit: "ชม." },
         en: { net: "Net Balance", start: "Check-in", end: "Check-out", forgot: "Forgot Start", manual: "Manual Entry", settings: "Settings", in: "In", out: "Out", total: "Total:", unit: "hrs" },
-        he: { net: "יתרה נטו", start: "כניסה", end: "יציאה", forgot: "שכחתי כניסה", manual: "הזנה ידנית", settings: "הגדרות", in: "כניסה", out: "יציאה", total: "סה\"ค:", unit: "שעות" }
+        he: { net: "יתרה נטו", start: "כניסה", end: "יציאה", forgot: "שכחתי כניסה", manual: "הזנה ידנית", settings: "הגדרות", in: "כניסה", out: "יציאה", total: "סה\"כ:", unit: "שעות" }
     };
     let currentLang = 'th';
     let isIncomeHidden = false;
 
-    // รายชื่อสีนีออนดุดัน 12 เดือน 12 สี (โทน Cyberpunk เข้มขรึม)
     const monthlyThemes = {
-        "01": "#00ff88", // มกราคม: เขียวนีออนเมทริกซ์
-        "02": "#00ffea", // กุมภาพันธ์: ฟ้าไซเบอร์ไอซ์
-        "03": "#bd00ff", // มีนาคม: ม่วงเทคโนดาร์ก
-        "04": "#ff0055", // เมษายน: แดงเชอร์รี่ดุดัน
-        "05": "#ff5500", // พฤษภาคม: ส้มแมกม่าเดือด
-        "06": "#ffb700", // มิถุนายน: เหลืองอำพันเตือนภัย
-        "07": "#00d2ff", // กรกฎาคม: น้ำเงินอิเล็กทริกบลู
-        "08": "#70ff00", // สิงหาคม: เขียวเลเซอร์ตองอ่อน
-        "09": "#ff00c8", // กันยายน: ชมพูนีออนสว่างวาบ
-        "10": "#ff3c00", // ตุลาคม: ส้มฟักทองฮาโลวีนเข้ม
-        "11": "#00ffa6", // พฤศจิกายน: เขียวหยกดิจิทัล
-        "12": "#9d50bb"  // ธันวาคม: ม่วงพลัมท้ายปี
+        "01": "#00ff88", "02": "#00ffea", "03": "#bd00ff", "04": "#ff0055",
+        "05": "#ff5500", "06": "#ffb700", "07": "#00d2ff", "08": "#70ff00",
+        "09": "#ff00c8", "10": "#ff3c00", "11": "#00ffa6", "12": "#9d50bb"
     };
 
-    // ฟังก์ชันเปลี่ยนสีแอปพลิเคชันตามเดือนที่ถูกเลือกใน Dropdown
     function applyMonthlyTheme() {
         const selectedMonth = document.getElementById('monthFilter').value;
         const targetColor = monthlyThemes[selectedMonth] || "#00ff88";
-        // เปลี่ยนค่าใน CSS Variable ตัวแปรเดียว คุมสีทั้งแอป
         document.documentElement.style.setProperty('--neon-color', targetColor);
     }
 
@@ -179,6 +166,28 @@
         renderData();
     }
 
+    // ฟังก์ชันช่วยเดาเวลาเข้า-ออกย้อนหลัง กรณีไม่มีข้อมูลติดมาใน Object
+    function autoEstimateTimes(hours) {
+        let startH = 6; // สมมติค่ามาตรฐานเริ่มต้นที่ 06:00
+        let startM = 0;
+        
+        // แปลงชั่วโมงทำงานกลับเป็นเวลาเลิกงาน
+        let totalMinutes = Math.round(hours * 60);
+        // ถ้าทำงานเกิน 5 ชั่วโมง ให้บวกเวลาพักเพิ่ม 30 นาทีกลับเข้าไปตามเงื่อนไขแอป
+        if (hours > 5) {
+            totalMinutes += 30;
+        }
+
+        let endTotalMinutes = (startH * 60 + startM) + totalMinutes;
+        let endH = Math.floor(endTotalMinutes / 60) % 24;
+        let endM = endTotalMinutes % 60;
+
+        let startTimeStr = `${startH.toString().padStart(2, '0')}:${startM.toString().padStart(2, '0')}`;
+        let endTimeStr = `${endH.toString().padStart(2, '0')}:${endM.toString().padStart(2, '0')}`;
+        
+        return { start: startTimeStr, end: endTimeStr };
+    }
+
     function renderData() {
         const workData = getWorkData();
         const rate = parseFloat(document.getElementById('rate').value) || 38;
@@ -201,12 +210,22 @@
                 
                 let displayDayPay = isIncomeHidden ? '***' : `₪${dayPay.toLocaleString()}`;
                 
+                // ตรวจสอบและดักจับ: หากไม่มีค่า startTime หรือ endTime ให้รันฟังก์ชันเดาเวลาแทนการปล่อยให้ขึ้น --:--
+                let showStart = item.startTime;
+                let showEnd = item.endTime;
+                
+                if (!showStart || showStart === '--:--' || !showEnd || showEnd === '--:--') {
+                    let estimated = autoEstimateTimes(h);
+                    showStart = showStart || estimated.start;
+                    showEnd = showEnd || estimated.end;
+                }
+                
                 listContainer.innerHTML += `
                     <div class="history-item">
                         <div class="hist-info">
                             <span style="font-weight:900; font-size:1.2rem;">${d.split('-')[2]}</span>
                             <span class="hist-time-tag">
-                                ${i18n[currentLang].in}: ${item.startTime || '--:--'} | ${i18n[currentLang].out}: ${item.endTime || '--:--'}
+                                ${i18n[currentLang].in}: ${showStart} | ${i18n[currentLang].out}: ${showEnd}
                             </span>
                             <span style="font-size:0.7rem; color:#666;">${h} ${i18n[currentLang].unit}</span>
                         </div>
@@ -275,6 +294,7 @@
         let diff = eDec - sDec;
         let finalH = diff > 5 ? (diff - 0.5).toFixed(2) : diff.toFixed(2);
         let wd = getWorkData();
+        // มั่นใจได้ว่าการเซฟจากหน้า Manual จะผูกค่าฟิลด์ startTime และ endTime ลงฐานข้อมูลตรงๆ เสมอ
         wd[d] = { hours: parseFloat(finalH), startTime: s, endTime: e };
         localStorage.setItem('work_data_v3', JSON.stringify(wd));
         document.getElementById('manualForm').style.display='none';
@@ -299,7 +319,6 @@
         }
     }
     
-    // เริ่มต้นระบบ: รันธีมสีก่อนเรนเดอร์ข้อมูล
     applyMonthlyTheme();
     checkRunningTimer(); 
     renderData();
